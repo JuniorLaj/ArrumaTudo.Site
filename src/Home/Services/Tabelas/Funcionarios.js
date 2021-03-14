@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import axios from '../utils/axios'
+import axios from '../../../utils/axios'
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { lighten, makeStyles } from '@material-ui/core/styles';
@@ -19,6 +19,9 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
+import CadastrarFuncionário from '../Cadastro/CadastrarFuncionário';
+import { Dialog, DialogTitle } from '@material-ui/core';
+import { AddCircleOutline } from '@material-ui/icons';
 
 
 function descendingComparator(a, b, orderBy) {
@@ -130,7 +133,13 @@ const useToolbarStyles = makeStyles((theme) => ({
 const EnhancedTableToolbar = (props) => {
     const classes = useToolbarStyles();
     const { numSelected } = props;
-
+    const [open, setOpen] = useState()
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+    const handleClose = () => {
+        setOpen(false);
+    };
     return (
         <Toolbar
             className={clsx(classes.root, {
@@ -142,10 +151,10 @@ const EnhancedTableToolbar = (props) => {
                     {numSelected} selected
                 </Typography>
             ) : (
-                    <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
-                        Funcionários
-                    </Typography>
-                )}
+                <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
+                    Funcionários
+                </Typography>
+            )}
 
             {numSelected > 0 ? (
                 <Tooltip title="Delete">
@@ -154,12 +163,16 @@ const EnhancedTableToolbar = (props) => {
                     </IconButton>
                 </Tooltip>
             ) : (
-                    <Tooltip title="Filter list">
-                        <IconButton aria-label="filter list">
-                            <FilterListIcon />
-                        </IconButton>
-                    </Tooltip>
-                )}
+                <Tooltip title="Adicionar Funcionário">
+                    <IconButton aria-label="Add">
+                        <AddCircleOutline onClick={handleClickOpen} />
+                    </IconButton>
+                </Tooltip>
+            )}
+            <Dialog open={open} DialogContent={false} onClose={handleClose} aria-labelledby="form-dialog-title">
+                <DialogTitle id="customized-dialog-title">Cadastrar Funcionário</DialogTitle>
+                <CadastrarFuncionário />
+            </Dialog>
         </Toolbar>
     );
 };
@@ -206,7 +219,7 @@ function Funcionarios() {
     const getRows = useCallback(async () => {
         await axios.get('/api/funcionarios/')
             .then(response => {
-                console.log("resposta aqui: ", response)
+                // console.log("resposta aqui: ", response)
                 setRows(response.data.funcionarios)
             }).catch(error => {
                 console.log(error)

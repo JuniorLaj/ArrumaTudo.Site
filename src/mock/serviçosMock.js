@@ -16,6 +16,5 @@ mock.onGet('/api/serviços/').reply(200, {
             status: 'em manutenção',
 
         },
-    ],
-
+    ]
 })

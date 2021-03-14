@@ -19,7 +19,7 @@ const useStyles = makeStyles({
     }
 })
 
-export default function Header() {
+function Header() {
     const classes = useStyles()
     const [isOpen, setisOpen] = useState(false)
     const ref = useRef()
@@ -81,3 +81,5 @@ export default function Header() {
         </Box>
     )
 }
+
+export default Header

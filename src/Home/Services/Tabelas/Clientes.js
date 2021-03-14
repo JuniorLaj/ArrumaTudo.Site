@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import axios from '../utils/axios'
+import axios from '../../../utils/axios'
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { lighten, makeStyles } from '@material-ui/core/styles';
@@ -19,6 +19,9 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
+import { AddCircleOutline } from '@material-ui/icons';
+import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
+import CadastrarServiço from '../Cadastro/CadastrarServiço';
 
 
 function descendingComparator(a, b, orderBy) {
@@ -48,10 +51,10 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-    { id: 'id', numeric: false, disablePadding: true, label: 'Id_equipamento' },
-    { id: 'modelo', numeric: false, disablePadding: false, label: 'Modelo' },
-    { id: 'defeito', numeric: false, disablePadding: false, label: 'Defeito' },
-    { id: 'status', numeric: false, disablePadding: false, label: 'Status' },
+    // { id: 'cpf', numeric: false, disablePadding: true, label: 'CPF' },
+    { id: 'nome', numeric: false, disablePadding: false, label: 'Nome' },
+    { id: 'celular', numeric: false, disablePadding: false, label: 'Celular' },
+    { id: 'endereço', numeric: false, disablePadding: false, label: 'Endereço' },
 ];
 
 function EnhancedTableHead(props) {
@@ -128,8 +131,15 @@ const useToolbarStyles = makeStyles((theme) => ({
 }));
 
 const EnhancedTableToolbar = (props) => {
-    const classes = useToolbarStyles();
     const { numSelected } = props;
+    const classes = useToolbarStyles();
+    const [open, setOpen] = useState(0)
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+    const handleClose = () => {
+        setOpen(false);
+    };
 
     return (
         <Toolbar
@@ -142,10 +152,10 @@ const EnhancedTableToolbar = (props) => {
                     {numSelected} selected
                 </Typography>
             ) : (
-                    <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
-                        Serviços
-                    </Typography>
-                )}
+                <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
+                    Clientes
+                </Typography>
+            )}
 
             {numSelected > 0 ? (
                 <Tooltip title="Delete">
@@ -154,12 +164,17 @@ const EnhancedTableToolbar = (props) => {
                     </IconButton>
                 </Tooltip>
             ) : (
-                    <Tooltip title="Filter list">
-                        <IconButton aria-label="filter list">
-                            <FilterListIcon />
-                        </IconButton>
-                    </Tooltip>
-                )}
+                <Tooltip title="Adicionar cliente">
+                    <IconButton aria-label="Add">
+                        {/* <FilterListIcon /> */}
+                        <AddCircleOutline onClick={handleClickOpen} />
+                    </IconButton>
+                </Tooltip>
+            )}
+            <Dialog open={open} DialogContent={false} onClose={handleClose} aria-labelledby="form-dialog-title">
+                <DialogTitle id="customized-dialog-title">Cadastrar cliente</DialogTitle>
+                {/* <CadastrarServiço /> */}
+            </Dialog>
         </Toolbar>
     );
 };
@@ -192,10 +207,10 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function Serviços() {
+function Clientes() {
     const classes = useStyles();
     const [order, setOrder] = useState('asc');
-    const [orderBy, setOrderBy] = useState('modelo');
+    const [orderBy, setOrderBy] = useState('nome');
     const [selected, setSelected] = useState([]);
     const [page, setPage] = useState(0);
     const [dense, setDense] = useState(false);
@@ -204,10 +219,10 @@ function Serviços() {
 
 
     const getRows = useCallback(async () => {
-        await axios.get('/api/serviços/')
+        await axios.get('/api/clientes/')
             .then(response => {
-                console.log("resposta aqui serviços: ", response)
-                setRows(response.data.serviços)
+                // console.log("resposta aqui: ", response)
+                setRows(response.data.clientes)
             }).catch(error => {
                 console.log(error)
             })
@@ -228,19 +243,19 @@ function Serviços() {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelecteds = rows.map((n) => n.id);
+            const newSelecteds = rows.map((n) => n.cpf);
             setSelected(newSelecteds);
             return;
         }
         setSelected([]);
     };
 
-    const handleClick = (event, id) => {
-        const selectedIndex = selected.indexOf(id);
+    const handleClick = (event, cpf) => {
+        const selectedIndex = selected.indexOf(cpf);
         let newSelected = [];
 
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, id);
+            newSelected = newSelected.concat(selected, cpf);
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
         } else if (selectedIndex === selected.length - 1) {
@@ -264,6 +279,9 @@ function Serviços() {
         setPage(0);
     };
 
+    const handleChangeDense = (event) => {
+        setDense(event.target.checked);
+    };
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
 
@@ -293,17 +311,17 @@ function Serviços() {
                             {stableSort(rows, getComparator(order, orderBy))
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row, index) => {
-                                    const isItemSelected = isSelected(row.id);
+                                    const isItemSelected = isSelected(row.cpf);
                                     const labelId = `enhanced-table-checkbox-${index}`;
 
                                     return (
                                         <TableRow
                                             hover
-                                            onClick={(event) => handleClick(event, row.id)}
+                                            onClick={(event) => handleClick(event, row.cpf)}
                                             role="checkbox"
                                             aria-checked={isItemSelected}
                                             tabIndex={-1}
-                                            key={row.id}
+                                            key={row.cpf}
                                             selected={isItemSelected}
                                         >
                                             <TableCell padding="checkbox">
@@ -312,14 +330,13 @@ function Serviços() {
                                                     inputProps={{ 'aria-labelledby': labelId }}
                                                 />
                                             </TableCell>
-                                            <TableCell component="th" id={labelId} scope="row" padding="none">
-                                                {row.id}
-                                            </TableCell>
-                                            {/* <TableCell align="right">{row.id}</TableCell> */}
-                                            <TableCell align="left">{row.modelo}</TableCell>
-                                            <TableCell align="left">{row.defeito}</TableCell>
-                                            <TableCell align="left">{row.status}</TableCell>
-
+                                            {/* <TableCell component="th" id={labelId} scope="row" padding="none">
+                                                {row.cpf}
+                                            </TableCell> */}
+                                            {/* <TableCell align="right">{row.cpf}</TableCell> */}
+                                            <TableCell align="left">{row.nome}</TableCell>
+                                            <TableCell align="left">{row.celular}</TableCell>
+                                            <TableCell align="right">{row.endereço}</TableCell>
                                         </TableRow>
                                     );
                                 })}
@@ -349,4 +366,4 @@ function Serviços() {
     );
 }
 
-export default Serviços
+export default Clientes
