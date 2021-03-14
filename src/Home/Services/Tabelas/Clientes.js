@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useDispatch } from 'react-redux'
 import axios from '../../../utils/axios'
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -216,7 +217,7 @@ function Clientes() {
     const [dense, setDense] = useState(false);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [rows, setRows] = useState([])
-
+    const dispatch = useDispatch()
 
     const getRows = useCallback(async () => {
         await axios.get('/api/clientes/')
@@ -250,17 +251,24 @@ function Clientes() {
         setSelected([]);
     };
 
-    const handleClick = (event, cpf) => {
-        const selectedIndex = selected.indexOf(cpf);
+    const handleClick = (event, row) => {
+        const selectedIndex = selected.indexOf(row.cpf);
         let newSelected = [];
 
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, cpf);
+            newSelected = newSelected.concat(selected, row.cpf);
+            dispatch({ type: 'selecionarCliente', payload: row })
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
+            dispatch({ type: 'selecionarCliente', payload: 0 })
+
         } else if (selectedIndex === selected.length - 1) {
             newSelected = newSelected.concat(selected.slice(0, -1));
+            dispatch({ type: 'selecionarCliente', payload: 0 })
+
         } else if (selectedIndex > 0) {
+            dispatch({ type: 'selecionarCliente', payload: 0 })
+
             newSelected = newSelected.concat(
                 selected.slice(0, selectedIndex),
                 selected.slice(selectedIndex + 1),
@@ -317,7 +325,7 @@ function Clientes() {
                                     return (
                                         <TableRow
                                             hover
-                                            onClick={(event) => handleClick(event, row.cpf)}
+                                            onClick={(event) => handleClick(event, row)}
                                             role="checkbox"
                                             aria-checked={isItemSelected}
                                             tabIndex={-1}

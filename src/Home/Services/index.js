@@ -2,10 +2,11 @@ import React, { useState } from 'react'
 import { Box, Tabs, Tab, Typography, makeStyles } from '@material-ui/core'
 import Serviços from './Tabelas/Serviços'
 import Funcionarios from './Tabelas/Funcionarios'
-import CadastrarServiço from './Cadastro/CadastrarServiço'
-import CadastrarFuncionário from './Cadastro/CadastrarFuncionário'
-import { useSelector } from 'react-redux'
 import Clientes from './Tabelas/Clientes'
+import ApresentaEquipamento from './Apresentação/ApresentaEquipamento'
+import ApresentaFuncionário from './Apresentação/ApresentaFuncionário'
+import ApresentaCliente from './Apresentação/ApresentaCliente'
+
 const useStyles = makeStyles({
 
     parteBaixo: {
@@ -42,7 +43,7 @@ export default function Cadastros() {
     }
     return (
         <Box className={classes.parteBaixo}>
-            <Box className={classes.tab}>
+            <Box >
                 {/* <select name="Galpões">
                         <option value="funcionarios">Galpão 1</option>
                         <option value="Produtos">Galpão 2</option>
@@ -65,16 +66,18 @@ export default function Cadastros() {
                 </TabPanel>
 
             </Box>
-            {/* <Box >
+            <Box >
+                <TabPanel value={tab} index={0}>
+                    <ApresentaCliente />
+                </TabPanel>
+
                 <TabPanel value={tab} index={1}>
-                    <CadastrarFuncionário />
+                    <ApresentaFuncionário />
                 </TabPanel>
-
                 <TabPanel value={tab} index={2}>
-                    <CadastrarServiço />
+                    <ApresentaEquipamento />
                 </TabPanel>
-            </Box> */}
-
+            </Box>
         </Box>
     )
 }

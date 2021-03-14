@@ -1,11 +1,9 @@
-// import servicesReducer from './servicesReducer'
+import selectedItemTable from './selectedItemTable'
 import { combineReducers } from 'redux'
-// import notificationsReducer from './notificationsReducers';
 
 const rootReducer = combineReducers({
-    // 'services': servicesReducer,
     // 'notifications': notificationsReducer
-
+    'selectedItem': selectedItemTable
 })
 
 export default rootReducer;

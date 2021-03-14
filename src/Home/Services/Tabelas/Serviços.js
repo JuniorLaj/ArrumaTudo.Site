@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useDispatch } from 'react-redux'
 import axios from '../../../utils/axios'
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -18,7 +19,6 @@ import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
 import { AddCircleOutline } from '@material-ui/icons';
 import { Dialog, DialogTitle } from '@material-ui/core';
 import CadastrarServiço from '../Cadastro/CadastrarServiço';
@@ -214,6 +214,8 @@ function Serviços() {
     const [dense, setDense] = useState(false);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [rows, setRows] = useState([])
+    const dispatch = useDispatch()
+
 
 
     const getRows = useCallback(async () => {
@@ -248,18 +250,22 @@ function Serviços() {
         setSelected([]);
     };
 
-    const handleClick = (event, id) => {
-        const selectedIndex = selected.indexOf(id);
+    const handleClick = (event, row) => {
+        const selectedIndex = selected.indexOf(row.id);
         let newSelected = [];
-        console.log(selectedIndex)
-
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, id);
+            newSelected = newSelected.concat(selected, row.id);
+            if (selected.length == 0) {
+                dispatch({ type: 'selecionarEquip', payload: row })
+            }
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
+            dispatch({ type: 'selecionarEquip', payload: 0 })
         } else if (selectedIndex === selected.length - 1) {
             newSelected = newSelected.concat(selected.slice(0, -1));
+            dispatch({ type: 'selecionarEquip', payload: 0 })
         } else if (selectedIndex > 0) {
+            dispatch({ type: 'selecionarEquip', payload: 0 })
             newSelected = newSelected.concat(
                 selected.slice(0, selectedIndex),
                 selected.slice(selectedIndex + 1),
@@ -312,7 +318,7 @@ function Serviços() {
                                     return (
                                         <TableRow
                                             hover
-                                            onClick={(event) => handleClick(event, row.id)}
+                                            onClick={(event) => handleClick(event, row)}
                                             role="checkbox"
                                             aria-checked={isItemSelected}
                                             tabIndex={-1}
