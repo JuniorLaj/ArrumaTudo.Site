@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { Box, Button, FormHelperText, Grid, makeStyles, TextField } from '@material-ui/core'
 import * as Yup from 'yup';
 import { Formik } from 'formik';
-import { cadastrarServiço } from '../../../actions/servicesActions';
+import { cadastrarServiço } from '../../../../actions/servicesActions';
 const UseStyles = makeStyles({
 
 })
