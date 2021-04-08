@@ -1,9 +1,9 @@
 import { Provider } from 'react-redux';
-import { BrowserRouter, Routes, Route} from 'react-router-dom'
+import { BrowserRouter, Routes} from 'react-router-dom'
 import './App.css';
-import Home from './pages/Home'
+import Home from './pages'
 import './mock'
-import SignIn from './pages/Sign-In';
+import HomeCliente from './pages/HomeCliente';
 import GuestRoute from './routes/guestRoute';
 import store from './store'
 function App() {
@@ -11,9 +11,8 @@ function App() {
     <Provider store={store}>
       <BrowserRouter>
       <Routes>
-      <GuestRoute path="//*" element={<Home />} />
-      <GuestRoute path="/inicio" element={<SignIn />} />
-      
+      <GuestRoute path="//*" element={<HomeCliente />} />
+      <GuestRoute path="/home" element={<Home />} />
       </Routes>
       </BrowserRouter>
     </Provider>

@@ -1,9 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux'
-
 import axios from '../../../../utils/axios'
-import api from '../../../../utils/api'
-
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { lighten, makeStyles } from '@material-ui/core/styles';
@@ -22,10 +19,9 @@ import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import CadastrarFuncionário from '../Cadastro/CadastrarFuncionário';
-import { Dialog, DialogTitle } from '@material-ui/core';
 import { AddCircleOutline } from '@material-ui/icons';
+import { Dialog, DialogTitle } from '@material-ui/core';
+import CadastrarServiço from '../Cadastro/CadastrarServiço';
 
 
 function descendingComparator(a, b, orderBy) {
@@ -55,10 +51,10 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-    { id: 'cpf', numeric: false, disablePadding: true, label: 'CPF' },
-    { id: 'nome', numeric: false, disablePadding: false, label: 'Nome' },
-    { id: 'Salário', numeric: true, disablePadding: false, label: 'Salário (R$)' },
-    { id: 'Jornada', numeric: true, disablePadding: false, label: 'Jornada (hrs)' },
+    { id: 'id', numeric: false, disablePadding: true, label: 'Id_equipamento' },
+    { id: 'modelo', numeric: false, disablePadding: false, label: 'Modelo' },
+    { id: 'defeito', numeric: false, disablePadding: false, label: 'Defeito' },
+    { id: 'status', numeric: false, disablePadding: false, label: 'Status' },
 ];
 
 function EnhancedTableHead(props) {
@@ -156,7 +152,7 @@ const EnhancedTableToolbar = (props) => {
                 </Typography>
             ) : (
                 <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
-                    Funcionários
+                    Serviços
                 </Typography>
             )}
 
@@ -167,15 +163,15 @@ const EnhancedTableToolbar = (props) => {
                     </IconButton>
                 </Tooltip>
             ) : (
-                <Tooltip title="Adicionar Funcionário">
+                <Tooltip title="Adicionar Equipamento">
                     <IconButton aria-label="Add">
                         <AddCircleOutline onClick={handleClickOpen} />
                     </IconButton>
                 </Tooltip>
             )}
             <Dialog open={open} DialogContent={false} onClose={handleClose} aria-labelledby="form-dialog-title">
-                <DialogTitle id="customized-dialog-title">Cadastrar Funcionário</DialogTitle>
-                <CadastrarFuncionário />
+                <DialogTitle id="customized-dialog-title">Adicionar Equipamento</DialogTitle>
+                <CadastrarServiço />
             </Dialog>
         </Toolbar>
     );
@@ -209,10 +205,10 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function Funcionarios() {
+function Serviços() {
     const classes = useStyles();
     const [order, setOrder] = useState('asc');
-    const [orderBy, setOrderBy] = useState('nome');
+    const [orderBy, setOrderBy] = useState('modelo');
     const [selected, setSelected] = useState([]);
     const [page, setPage] = useState(0);
     const [dense, setDense] = useState(false);
@@ -221,11 +217,12 @@ function Funcionarios() {
     const dispatch = useDispatch()
 
 
+
     const getRows = useCallback(async () => {
-        await axios.get('/api/funcionarios/')
+        await axios.get('/api/serviços/')
             .then(response => {
-                // console.log("resposta aqui: ", response)
-                setRows(response.data.funcionarios)
+                // console.log("resposta aqui serviços: ", response)
+                setRows(response.data.serviços)
             }).catch(error => {
                 console.log(error)
             })
@@ -246,7 +243,7 @@ function Funcionarios() {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelecteds = rows.map((n) => n.cpf);
+            const newSelecteds = rows.map((n) => n.id);
             setSelected(newSelecteds);
             return;
         }
@@ -254,25 +251,21 @@ function Funcionarios() {
     };
 
     const handleClick = (event, row) => {
-        const selectedIndex = selected.indexOf(row.cpf);
-        console.log("index selecionado: ", selectedIndex)
+        const selectedIndex = selected.indexOf(row.id);
         let newSelected = [];
-
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, row.cpf);
-            dispatch({ type: 'selecionarFunc', payload: row })
-
+            newSelected = newSelected.concat(selected, row.id);
+            if (selected.length === 0) {
+                dispatch({ type: 'selecionarEquip', payload: row })
+            }
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
-            dispatch({ type: 'selecionarFunc', payload: 0 })
-
+            dispatch({ type: 'selecionarEquip', payload: 0 })
         } else if (selectedIndex === selected.length - 1) {
             newSelected = newSelected.concat(selected.slice(0, -1));
-            dispatch({ type: 'selecionarFunc', payload: 0 })
-
+            dispatch({ type: 'selecionarEquip', payload: 0 })
         } else if (selectedIndex > 0) {
-            dispatch({ type: 'selecionarFunc', payload: 0 })
-
+            dispatch({ type: 'selecionarEquip', payload: 0 })
             newSelected = newSelected.concat(
                 selected.slice(0, selectedIndex),
                 selected.slice(selectedIndex + 1),
@@ -291,12 +284,8 @@ function Funcionarios() {
         setPage(0);
     };
 
-    const handleChangeDense = (event) => {
-        setDense(event.target.checked);
-    };
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
-
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
     return (
@@ -323,7 +312,7 @@ function Funcionarios() {
                             {stableSort(rows, getComparator(order, orderBy))
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row, index) => {
-                                    const isItemSelected = isSelected(row.cpf);
+                                    const isItemSelected = isSelected(row.id);
                                     const labelId = `enhanced-table-checkbox-${index}`;
 
                                     return (
@@ -333,7 +322,7 @@ function Funcionarios() {
                                             role="checkbox"
                                             aria-checked={isItemSelected}
                                             tabIndex={-1}
-                                            key={row.cpf}
+                                            key={row.id}
                                             selected={isItemSelected}
                                         >
                                             <TableCell padding="checkbox">
@@ -343,12 +332,13 @@ function Funcionarios() {
                                                 />
                                             </TableCell>
                                             <TableCell component="th" id={labelId} scope="row" padding="none">
-                                                {row.cpf}
+                                                {row.id}
                                             </TableCell>
-                                            {/* <TableCell align="right">{row.cpf}</TableCell> */}
-                                            <TableCell align="left">{row.nome}</TableCell>
-                                            <TableCell align="right">{row.Salário}</TableCell>
-                                            <TableCell align="right">{row.Jornada}</TableCell>
+                                            {/* <TableCell align="right">{row.id}</TableCell> */}
+                                            <TableCell align="left">{row.modelo}</TableCell>
+                                            <TableCell align="left">{row.defeito}</TableCell>
+                                            <TableCell align="left">{row.status}</TableCell>
+
                                         </TableRow>
                                     );
                                 })}
@@ -378,4 +368,4 @@ function Funcionarios() {
     );
 }
 
-export default Funcionarios
+export default Serviços

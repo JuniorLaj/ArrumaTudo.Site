@@ -1,7 +1,7 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
+// import { useSelector } from 'react-redux'
 import { Route } from 'react-router'
-import Home from '../pages/Home'
+import Home from '../pages'
 // import authService from '../services/authService'
 
 function GuestRoute({element: Component, ...rest}) {
@@ -10,11 +10,14 @@ function GuestRoute({element: Component, ...rest}) {
     const isAuthenticated = false
     console.log("Constante isauthenticated setada para false")
     return(
-        <Route {...rest} element={(
-            isAuthenticated
-            ? <Home/>
-            : Component
-        )}/>
+        <Route {...rest} element={
+            Component
+        //     (
+        //     isAuthenticated
+        //     ? Component
+        //     : <Home/>
+        // )
+    }/>
     )
 }
 

@@ -1,16 +1,13 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Avatar from '@material-ui/core/Avatar';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import Link from '@material-ui/core/Link';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import FormHelperText from '@material-ui/core/FormHelperText';
-import { useDispatch } from 'react-redux';
+// import { useDispatch } from 'react-redux';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -19,8 +16,8 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Popover from '@material-ui/core/Popover';
 import FormFuncionario from './FormFuncionario';
 import { FaRocket } from 'react-icons/fa';
-import { List } from '@material-ui/core';
-// import { signIn } from '../../actions/accountActions';
+import apiEquip from '../../utils/apiEquipamento'
+
 const useStyles = makeStyles((theme) => ({
     root: {
         height: '100vh',
@@ -59,11 +56,29 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
- function SignIn(){
+ function HomeCliente(){
     const classes = useStyles();
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
+    // const navigate = useNavigate();
+    // const dispatch = useDispatch();
+    const [equipsCliente,setEquipsCliente] = useState([])
     const [anchorEl, setAnchorEl] = useState(null);
+
+    const getEquipsCliente = useCallback(async (cpf)=> {
+        await apiEquip.get(`/equipamento/cliente/${cpf}`)
+        .then(response => {
+            console.log(response.data)
+            setEquipsCliente(response.data)
+            
+        }).catch(error => {
+            console.log(error)
+        })
+    }, [setEquipsCliente])
+    
+    // useEffect(() => {
+    //     getEquipsCliente()
+
+    // }, [getEquipsCliente])
+
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
       };
@@ -71,7 +86,7 @@ const useStyles = makeStyles((theme) => ({
       const handleClose = () => {
         setAnchorEl(null);
       };
-    
+      
       const open = Boolean(anchorEl);
       const id = open ? 'simple-popover' : undefined;
 
@@ -109,11 +124,11 @@ const useStyles = makeStyles((theme) => ({
             <center>
 
                 <img src="logo192.png"/>
+                {/* <img src="logo192.png"/>
                 <img src="logo192.png"/>
                 <img src="logo192.png"/>
                 <img src="logo192.png"/>
-                <img src="logo192.png"/>
-                <img src="logo192.png"/>
+                <img src="logo192.png"/> */}
 
 
             </center>
@@ -136,7 +151,7 @@ const useStyles = makeStyles((theme) => ({
 
                         }}
                         validationSchema={Yup.object().shape({
-                            email: Yup.string()
+                            cpf: Yup.string()
                                 .max(11)
                                 .required('Favor informar o cpf'),
                         })}
@@ -145,7 +160,10 @@ const useStyles = makeStyles((theme) => ({
                             { setErrors, setStatus, setSubmitting },
                         ) => {
                             try {
-                                // await dispatch(signIn(values.email, values.password));
+                                 await getEquipsCliente(values.cpf)
+                                 setStatus({ success: true });
+                                //  setErrors({ submit: message });
+                                 setSubmitting(true);
                             } catch (error) {
                                 const message =
                                     (error.response && error.response.data.message) ||
@@ -193,42 +211,36 @@ const useStyles = makeStyles((theme) => ({
                 </Box>
             </Box>
 
-                <table BORDER ="1" className={classes.listaCliente} >
-                    <tr>
-                        <th>Número pedido</th>
+            <table BORDER ="1" className={classes.listaCliente} >
+                    
+                <tr>
+                    <th>Número pedido</th>
 
-                        <th>Modelo</th>
+                    <th>Tipo</th>
 
-                        <th>Data de Entrada</th>
+                    <th>Data de Entrada</th>
 
-                        <th>Data de entrega (prevista)</th>
+                    <th>Data de entrega (prevista)</th>
 
-                        <th>Status</th>
-                    </tr>
-                    <tr>
-                        <td>05424</td>
-                        <td>RTX 04541</td>
-                        <td>21/03</td>
-                        <td>28/03</td>
-                        <td>Em andamento</td>
-
-                    </tr>
-                    {/* result.map((tab) => {
+                    <th>Status</th>
+                </tr>
+                
+                {
+                    
+                    equipsCliente.map((tab) => (
                         <tr>
-                        <td>tab.id</td>
-                        <td>tab.modelo</td>
-                        <td>tab.data_entrada</td>
-                        <td>tab.data_entrega</td>
-                        <td>tab.status</td>
-
+                        <td>{tab.id_equipamento}</td>
+                        <td>{tab.tipo}</td>
+                        <td>{new Date(tab.data_entrada).toLocaleDateString()}</td>
+                        <td>{new Date(tab.data_entrega).toLocaleDateString()}</td>
+                        <td>{tab.status? 'Pronto':'Em andamento'}</td>
                     </tr>
-                    }) */}
-
-                </table>
+                    ))
+                }
+            </table>
         </Box>
-            </>
-        )
-            
+    </>
+    )
 }
 
-export default SignIn
+export default HomeCliente

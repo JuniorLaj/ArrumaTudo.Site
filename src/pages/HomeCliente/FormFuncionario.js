@@ -1,11 +1,7 @@
 import React from 'react'
-import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import Avatar from '@material-ui/core/Avatar';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import Link from '@material-ui/core/Link';
 import { useDispatch } from 'react-redux';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -13,8 +9,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import { useNavigate } from 'react-router';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import AccountCircle from '@material-ui/icons/AccountCircle';
+import { signIn } from '../../actions/accountActions';
+
 const useStyles = makeStyles((theme) => ({
 
     button: {
@@ -55,8 +51,8 @@ export default function FormFuncionario(){
                     { setErrors, setStatus, setSubmitting },
                 ) => {
                     try {
-                        // await dispatch(signIn(values.email, values.password));
-                        navigate('/');
+                        await dispatch(signIn(values.email, values.password));
+                        navigate('/home')
                     } catch (error) {
                         const message =
                             (error.response && error.response.data.message) ||

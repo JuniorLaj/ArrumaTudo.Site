@@ -1,47 +1,60 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
-import { Box, Button, FormHelperText, Grid, makeStyles, TextField } from '@material-ui/core'
+import { DialogContent, Box, Button,FormHelperText, TextField, Grid, makeStyles } from '@material-ui/core'
+import { Formik } from 'formik'
 import * as Yup from 'yup';
-import { Formik } from 'formik';
-import { cadastrarServiço } from '../../../../actions/servicesActions';
-const UseStyles = makeStyles({
+import { useSelector } from 'react-redux'
+import {KeyboardDatePicker} from '@material-ui/pickers'
+import apiFuncionario from '../../../../utils/apiFuncionario'
+// import { useNavigate } from 'react-router';
+const useStyles = makeStyles({
+    textField: {
+        marginRight:'20vh',
+    },
 
 })
-export default function CadastrarServiço() {
-    const classes = UseStyles();
-    // const dispatch = useDispatch();
+function EditarFuncionario(props) {
+    const classes = useStyles()
+    const Funcionario = useSelector(state=> state.selectedItem.Funcionario)
+    console.log(Funcionario)
     return (
-        <Grid >
+        <DialogContent>
+            <Grid>
             <Box display="flex" flexDirection="column" alignItems="center" mt={8}>
                 <Formik
                     initialValues={{
-                        modelo: '',
-                        defeito: '',
-                        // work: '',
-                        cpf: '',
-                        // password: '',
+                        fullname: '',
+                        username: '',
+                        work: '',
+                        email: '',
+                        password: '',
                     }}
                     validationSchema={Yup.object().shape({
-                        modelo: Yup.string().max(255)
-                            .min(4, 'O modelo precisa ter ao menos 4 caracteres.')
-                            .required('Favor informar o modelo.'),
-                        defeito: Yup.string().max(255)
-                            .required('Favor informar um defeito. '),
-                        cpf: Yup.string()
+                        fullname: Yup.string().max(255)
+                            .min(10, 'O nome precisa ter ao menos 10 caracteres')
+                            .required('Favor informar o nome completo'),
+                        username: Yup.string().max(255)
+                            .required('Favor informar um UserName. '),
+                        work: Yup.string().max(255).required('Favor informar uma atividade. '),
+                        email: Yup.string()
+                            .email('Favor informar um email válido. ')
                             .max(255)
-                            .required('Favor informar o cpf de um cliente'),
+                            .required('Favor informar o email'),
+                        password: Yup.string()
+                            .max(255).min(7, 'O password precisa ter ao menos 7 caractéres. ')
+                            .required('Favor informar o password. '),
                     })}
                     onSubmit={async (
                         values,
                         { setErrors, setStatus, setSubmitting },
                     ) => {
                         try {
-                            // await dispatch(cadastrarServiço(values.modelo, values.defeito, values.work, values.cpf, values.password));
+                            // await dispatch(signUp(values.fullname, values.username, values.work, values.email, values.password));
                             // navigate('/');
                         } catch (error) {
                             const message =
                                 (error.response && error.response.data.message) ||
                                 'Alguma coisa aconteceu';
+
                             setStatus({ success: false });
                             setErrors({ submit: message });
                             setSubmitting(false);
@@ -55,38 +68,38 @@ export default function CadastrarServiço() {
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="modelo"
-                                label="Modelo"
-                                name="modelo"
-                                autoComplete="modelo"
+                                id="fullname"
+                                label="fullname"
+                                name="fullname"
+                                autoComplete="fullname"
                                 autoFocus
-                                error={Boolean(errors.modelo)}
-                                value={values.modelo}
+                                error={Boolean(errors.fullname)}
+                                value={values.fullname}
                                 onChange={handleChange}
-                                helperText={errors.modelo}
+                                helperText={errors.fullname}
                             />
                             <TextField
                                 variant="outlined"
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="defeito"
-                                label="Defeito"
-                                name="defeito"
-                                autoComplete="defeito"
+                                id="username"
+                                label="UserName"
+                                name="username"
+                                autoComplete="username"
                                 autoFocus
-                                error={Boolean(errors.defeito)}
-                                value={values.defeito}
+                                error={Boolean(errors.username)}
+                                value={values.username}
                                 onChange={handleChange}
-                                helperText={errors.defeito}
+                                helperText={errors.username}
                             />
-                            {/* <TextField
+                            <TextField
                                 variant="outlined"
                                 margin="normal"
                                 required
                                 fullWidth
                                 id="work"
-                                label="Data de Entrada"
+                                label="Área de Trabalho"
                                 name="work"
                                 autoComplete="work"
                                 autoFocus
@@ -94,23 +107,23 @@ export default function CadastrarServiço() {
                                 value={values.work}
                                 onChange={handleChange}
                                 helperText={errors.work}
-                            /> */}
+                            />
                             <TextField
                                 variant="outlined"
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="cpf"
-                                label="Cliente (CPF)"
-                                name="cpf"
-                                autoComplete="cpf"
+                                id="email"
+                                label="E-mail"
+                                name="email"
+                                autoComplete="email"
                                 autoFocus
-                                error={Boolean(errors.cpf)}
-                                value={values.cpf}
+                                error={Boolean(errors.email)}
+                                value={values.email}
                                 onChange={handleChange}
-                                helperText={errors.cpf}
+                                helperText={errors.email}
                             />
-                            {/* <TextField
+                            <TextField
                                 variant="outlined"
                                 margin="normal"
                                 required
@@ -124,7 +137,7 @@ export default function CadastrarServiço() {
                                 onChange={handleChange}
                                 error={Boolean(errors.password)}
                                 helperText={errors.password}
-                            /> */}
+                            />
                             <Button
                                 fullWidth
                                 variant="contained"
@@ -133,7 +146,7 @@ export default function CadastrarServiço() {
                                 type="submit"
                                 disbled={isSubmitting}
                             >
-                                Cadastrar Equipamento
+                                Editar
                 </Button>
                             {errors.submit && (
                                 <FormHelperText error>{errors.submit}</FormHelperText>
@@ -151,6 +164,9 @@ export default function CadastrarServiço() {
                 </Formik>
                 {/* <Copyright /> */}
             </Box>
-        </Grid>
+            </Grid>
+
+        </DialogContent>
     )
 }
+export default EditarFuncionario

@@ -1,20 +1,20 @@
-import axios from '../utils/axios'
+import apiFuncionario from '../utils/apiFuncionario'
 
 class AuthServices {
     //outras funções
 
-    cadastrarServiço = (modelo, defeito, cpf) => {
+    signIn = (email, password) => {
+
+        // pesquisar sobre: "promisse javascript"
 
         return (new Promise((resolve, reject) => {
-
-            axios.post('/v1/auth/cadastrarServiço', { modelo, defeito, cpf })
-                .then(response => {
-                    if (response.data.service) {
-
-                        // this.setToken(response.data.token)
-                        resolve(response.data.service)
+            apiFuncionario.post('/auth/login', { email, password })
+            .then(response => {
+                    if (response.data.user) {
+                        console.log(response)
+                        resolve(response.data.user)
                     } else {
-                        reject(response.data)
+                        reject(response.data.error)
                     }
                 })
                 .catch(error => {

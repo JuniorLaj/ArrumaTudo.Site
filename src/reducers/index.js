@@ -1,8 +1,9 @@
 import selectedItemTable from './selectedItemTable'
 import { combineReducers } from 'redux'
+import accountReducer from './accountReducer';
 
 const rootReducer = combineReducers({
-    // 'notifications': notificationsReducer
+    'account': accountReducer,
     'selectedItem': selectedItemTable
 })
 

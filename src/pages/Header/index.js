@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { Box, makeStyles, Typography, Avatar, AppBar, Toolbar, Menu, MenuItem } from '@material-ui/core'
+import { useSelector } from 'react-redux'
 
 
 const useStyles = makeStyles({
@@ -23,7 +24,7 @@ function Header() {
     const classes = useStyles()
     const [isOpen, setisOpen] = useState(false)
     const ref = useRef()
-
+    const account = useSelector(state => state.account.user.data)
     const handleOpen = () => {
         setisOpen(true)
     }
@@ -37,13 +38,13 @@ function Header() {
             <AppBar style={{ boxShadow: 'none' }} position="fixed" color="inherit">
                 <Toolbar>
                     <div>
-                        <h2> TRABALHO BD</h2>
+                        <h2> ARRUMA TUDO</h2>
                     </div>
                     <div></div>
                     <div className={classes.grow} />
                     <div>
-                        <Typography variant="body1">José Martins da Rosa Júnior</Typography>
-                        <Typography variant="">Funcionário</Typography>
+                        <Typography variant="body1">{account.nome}</Typography>
+                        <Typography variant="">{account.cpf === account.cpf_gerente? 'Gerente' : 'Funcionario'}</Typography>
                     </div>
                     <div className={classes.userSection}>
                         <Box ml={2} />
@@ -54,7 +55,7 @@ function Header() {
                         <Avatar
                             ref={ref}
                             onClick={handleOpen}
-                            alt="Remy Sharp" //account.name
+                            alt={account.nome} //account.name
                             src='/'
                         // src={account.user && account.user.avatar}
                         >
