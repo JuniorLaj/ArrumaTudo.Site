@@ -1,7 +1,6 @@
 import axios from '../utils/axios'
 
 class QueryService {
-    //outras funções
 
     cadastrarEquipamento = (modelo, defeito, cpf) => {
 
@@ -10,8 +9,6 @@ class QueryService {
             axios.post('/v1/auth/cadastrarServiço', { modelo, defeito, cpf })
                 .then(response => {
                     if (response.data.service) {
-
-                        // this.setToken(response.data.token)
                         resolve(response.data.service)
                     } else {
                         reject(response.data)

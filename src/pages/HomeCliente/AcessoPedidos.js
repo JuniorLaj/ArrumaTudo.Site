@@ -7,11 +7,9 @@ import * as Yup from 'yup';
 import Avatar from '@material-ui/core/Avatar';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-// import { useNavigate } from 'react-router-dom';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Typography from '@material-ui/core/Typography';
-import { Box, IconButton, Tooltip } from '@material-ui/core';
-import ExitToApp from '@material-ui/icons/ExitToApp';
+import { Box,  } from '@material-ui/core';
 import { useNavigate } from 'react-router';
 
 const useStyles = makeStyles((theme) => ({
@@ -127,6 +125,11 @@ export default function AcessoPedidos(){
                 ))
             }
             </table>
+            </Box>
+            <Box mt = {6} display='flex' flexDirection = 'column' alignItems='center'>
+                <Button onClick={()=>navigate("/")}>
+                    VOLTAR
+                </Button>
             </Box>
         </>
     )

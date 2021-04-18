@@ -13,6 +13,7 @@ import { Button, Dialog, DialogTitle,  } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import EditarFuncionario from '../Apresentação/EditarFuncionario';
 import CadastrarFuncionario from '../Cadastro/CadastrarFuncionário'
+import ModelOk from '../../../../models/modelOk';
 
 const useStyles = makeStyles({
     buttonAdd: {
@@ -24,26 +25,11 @@ const useStyles = makeStyles({
 })
 
 function Funcionarios() {
-    const classes = useStyles();
-    const [rows, setRows] = useState([])
-    const [openAddFuncionario,setOpenAddFuncionario] = useState()
-    const account = useSelector(state => state.account.user.data)
     const dispatch = useDispatch()
-    const [open, setOpen] = useState()
-    const handleClickOpen = (tab) => {
-        dispatch({ type: 'selecionarFuncionario', payload: tab })
-        console.log(tab)
-        setOpen(true);
-    };
-    const handleClose = () => {
-        setOpenAddFuncionario(false)
-        setOpen(false);
-    };
-
-    const handleAdicionarFuncionario = () => {
-        setOpenAddFuncionario(true)
-    };
-
+    const classes = useStyles();
+    const account = useSelector(state => state.account.user.data)
+    
+    const [rows, setRows] = useState([])
     const getRows = useCallback(async () => {
         await apiFuncionario.get(`/funcionarios/${account.idgerente}`)
             .then(response => {
@@ -51,7 +37,6 @@ function Funcionarios() {
             }).catch(error => {
                 console.log(error)
             })
-
     }, [setRows])
 
     useEffect(() => {
@@ -59,6 +44,46 @@ function Funcionarios() {
 
     }, [getRows])
 
+    /*Adicionar*/
+    const [openAddFuncionario,setOpenAddFuncionario] = useState()
+    const [openModelOkCreate, setOpenModelOkCreate] = useState(false)
+
+//#######################################################
+
+    const handleAdicionarFuncionario = () => {
+        setOpenAddFuncionario(true)
+    };
+
+    const handleCloseAddFuncionario = () => {
+        setOpenAddFuncionario(false)
+        setOpenModelOkCreate(true)
+    };
+
+    const handleCloseModelOkCreate = () => {
+        setOpenModelOkCreate(false);
+    };
+//#######################################################
+
+
+    /*Editar*/
+    const [openEdit, setOpenEdit] = useState()
+    const [openModelOkEdit, setOpenModelOkEdit] = useState(false)
+
+//#######################################################
+    const handleClickOpenEdit = (tab) => {
+        dispatch({ type: 'selecionarFuncionario', payload: tab })
+        setOpenEdit(true);
+    };
+    
+    const handleCloseEdit = () => {
+        setOpenEdit(false);
+        setOpenModelOkEdit(true);    
+    };
+
+    const handleCloseModelOkEdit = () => {
+        setOpenModelOkEdit(false);
+    };
+//#######################################################
 
     return(
         <>
@@ -68,15 +93,20 @@ function Funcionarios() {
         </Button>
         </div>
         <Dialog open={openAddFuncionario} DialogContent={false}
-            onClose={handleClose} aria-labelledby="form-dialog-addFuncionario">
+            onClose={handleCloseAddFuncionario} aria-labelledby="form-dialog-addFuncionario">
             <DialogTitle id="customized-dialog-addFuncionario">Adicionar Funcionário</DialogTitle>
-            <CadastrarFuncionario getRows = {()=>getRows()}/>
+            <CadastrarFuncionario close={handleCloseAddFuncionario} getRows = {()=>getRows()}/>
+        </Dialog>
+        <Dialog open={openModelOkCreate} DialogContent={false}
+            onClose={handleCloseModelOkCreate} aria-labelledby="form-sdialog-title">
+            <DialogTitle id="customized-dialosg-title">Adicionar Funcionário</DialogTitle>
+            <ModelOk message ="Funcionário adicionado com sucesso!" closeModel={handleCloseModelOkCreate}/>
         </Dialog>
         <TableContainer >
             <Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell>CPF</TableCell>
+                        <TableCell>ID</TableCell>
                         <TableCell>NOME</TableCell>
                         <TableCell>ENDEREÇO</TableCell>
                         <TableCell>TELEFONE</TableCell>
@@ -92,14 +122,15 @@ function Funcionarios() {
                             {/* <tr> */}
                             <TableCell>{tab.idfuncionario}</TableCell>
                             <TableCell>{tab.nome}</TableCell>
-                            <TableCell>{tab.endereco}</TableCell>
+                            <TableCell>{`Rua ${tab.rua}, nº ${tab.numero},
+                                         Bairro ${tab.bairro}, ${tab.cidade}-${tab.estado}`}</TableCell>
                             <TableCell>{tab.telefone}</TableCell>
                             <TableCell align='center'>
                                 {new Date(tab.datanascimento).toLocaleDateString()}
                             </TableCell>
                             <TableCell>{tab.salario}</TableCell>
                             <TableCell align = 'center' >
-                                <Button onClick={() => handleClickOpen(tab)}>
+                                <Button onClick={() => handleClickOpenEdit(tab)}>
                                     <EditIcon  color='secondary'/>
                                 </Button>
                                 <Button onClick={async ()=>{
@@ -118,10 +149,16 @@ function Funcionarios() {
                             
                             </TableRow>
                     ))}
-                    <Dialog open={open} DialogContent={false}
-                        onClose={handleClose} aria-labelledby="form-dialog-title">
+                    <Dialog open={openEdit} DialogContent={false}
+                        onClose={handleCloseEdit} aria-labelledby="form-dialog-title">
                         <DialogTitle id="customized-dialog-title">Editar Funcionário</DialogTitle>
-                        <EditarFuncionario getRows = {()=>getRows()}/>
+                        <EditarFuncionario close={() => handleCloseEdit()} getRows = {()=>getRows()}/>
+                    </Dialog>
+
+                    <Dialog open={openModelOkEdit} DialogContent={false}
+                        onClose={handleCloseModelOkEdit} aria-labelledby="form-sdialog-title">
+                        <DialogTitle id="customized-dialosg-title">Editar Funcionário</DialogTitle>
+                        <ModelOk message ="Funcionário editado com sucesso!" closeModel={handleCloseModelOkEdit}/>
                     </Dialog>
                 </TableBody>
             </Table>

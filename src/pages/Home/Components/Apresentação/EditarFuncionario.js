@@ -1,10 +1,11 @@
 import React from 'react'
-import { DialogContent, Box, Button,FormHelperText, TextField, Grid, makeStyles } from '@material-ui/core'
+import { DialogContent, Box, Button,FormHelperText, TextField, Grid, makeStyles} from '@material-ui/core'
 import { Formik } from 'formik'
 import * as Yup from 'yup';
 import { useSelector } from 'react-redux'
 import apiFuncionario from '../../../../utils/apiFuncionario'
-// import { useNavigate } from 'react-router';
+
+
 const useStyles = makeStyles({
     textField: {
         marginRight:'20vh',
@@ -15,13 +16,18 @@ function EditarFuncionario(props) {
     const classes = useStyles()
     const funcionario = useSelector(state=> state.selectedItem.funcionario)
     return (
+        <>
         <DialogContent>
             <Grid>
             <Box display="flex" alignItems="center" >
                 <Formik
                     initialValues={{
                         nome: funcionario.nome.toString(),
-                        endereco: funcionario.endereco.toString(),
+                        rua: funcionario.rua.toString(),
+                        numero: funcionario.numero,
+                        bairro: funcionario.bairro.toString(),
+                        cidade: funcionario.cidade.toString(),
+                        estado: funcionario.estado.toString(),
                         telefone: funcionario.telefone.toString(),
                         data_nascimento: new Date(funcionario.data_nascimento).toLocaleDateString(),
                         salario: funcionario.salario,
@@ -32,10 +38,18 @@ function EditarFuncionario(props) {
                             .required('Favor informar o nome completo'),
                         telefone: Yup.string().max(11,'Telefone tem mais de 11 dígitos.')
                             .required('Favor informar um Telefone. '),
-                        endereco: Yup.string()
-                            .min(20, 'O endereço precisa ter ao menos 20 caracteres.')
-                            .max(255)
-                            .required('Favor informar o endereço completo'),
+                        rua: Yup.string()
+                        .max(255)
+                        .required('Favor informar a rua.'),
+                        bairro: Yup.string()
+                            .max(50)
+                            .required('Favor informar o bairro.'),
+                        cidade: Yup.string()
+                        .max(50)
+                        .required('Favor informar a cidade.'),
+                        estado: Yup.string()
+                        .max(2,'Coloque somente a sigla do estado.')
+                        .required('Favor informar o estado.'),
                     })}
                     onSubmit={async (
                         values,
@@ -44,13 +58,18 @@ function EditarFuncionario(props) {
                         try {
                             await apiFuncionario.put(`/editarfuncionario`,{
                                 nome: values.nome,
-                                endereco: values.endereco,
+                                rua: values.rua,
+                                numero: values.numero,
+                                bairro: values.bairro,
+                                cidade: values.cidade,
+                                estado: values.estado,
                                 telefone: values.telefone,
                                 salario: values.salario,
                                 idFuncionario: funcionario.idfuncionario
                             })
                             setStatus({ success: true });
                             setSubmitting(true);
+                            props.close()
                         } catch(error){
                             const message =
                             (error.response && error.response.data.message) ||
@@ -86,15 +105,75 @@ function EditarFuncionario(props) {
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="endereco"
-                                label="Endereço Completo"
-                                name="endereco"
-                                autoComplete="endereco"
+                                id="rua"
+                                label="Rua"
+                                name="rua"
+                                autoComplete="rua"
                                 autoFocus
-                                error={Boolean(errors.endereco)}
-                                value={values.endereco}
+                                error={Boolean(errors.rua)}
+                                value={values.rua}
                                 onChange={handleChange}
-                                helperText={errors.endereco}
+                                helperText={errors.rua}
+                            />
+                             <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="numero"
+                                label="Número"
+                                name="numero"
+                                autoComplete="numero"
+                                autoFocus
+                                error={Boolean(errors.numero)}
+                                value={values.numero}
+                                onChange={handleChange}
+                                helperText={errors.numero}
+                            />
+                             <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="bairro"
+                                label="Bairro"
+                                name="bairro"
+                                autoComplete="bairro"
+                                autoFocus
+                                error={Boolean(errors.bairro)}
+                                value={values.bairro}
+                                onChange={handleChange}
+                                helperText={errors.bairro}
+                            />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="cidade"
+                                label="Cidade"
+                                name="cidade"
+                                autoComplete="cidade"
+                                autoFocus
+                                error={Boolean(errors.cidade)}
+                                value={values.cidade}
+                                onChange={handleChange}
+                                helperText={errors.cidade}
+                            />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="estado"
+                                label="Estado"
+                                name="estado"
+                                autoComplete="estado"
+                                autoFocus
+                                error={Boolean(errors.estado)}
+                                value={values.estado}
+                                onChange={handleChange}
+                                helperText={errors.estado}
                             />
                             <TextField
                                 variant="outlined"
@@ -143,8 +222,8 @@ function EditarFuncionario(props) {
                 </Formik>
             </Box>
             </Grid>
-
         </DialogContent>
+        </>
     )
 }
 export default EditarFuncionario

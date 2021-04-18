@@ -1,10 +1,7 @@
 import apiFuncionario from '../utils/apiFuncionario'
 
 class AuthServices {
-    //outras funções
     signIn = (email, password) => {
-
-        // pesquisar sobre: "promisse javascript"
 
         return (new Promise((resolve, reject) => {
             apiFuncionario.post('/auth/login', { email, password })

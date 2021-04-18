@@ -4,7 +4,8 @@ import { Formik } from 'formik'
 import * as Yup from 'yup';
 import { useSelector } from 'react-redux'
 import apiCliente from '../../../../utils/apiCliente'
-// import { useNavigate } from 'react-router';
+
+
 const useStyles = makeStyles({
     textField: {
         marginRight:'20vh',
@@ -23,7 +24,11 @@ function EditarCliente(props) {
                         cpf: cliente.cpf,
                         nome: cliente.nome.toString(),
                         telefone: cliente.telefone.toString(),
-                        endereco: cliente.endereco.toString(),
+                        rua: cliente.rua.toString(),
+                        numero: cliente.numero,
+                        bairro: cliente.bairro.toString(),
+                        cidade: cliente.cidade.toString(),
+                        estado: cliente.estado.toString(),
                     }}
                     validationSchema={Yup.object().shape({
                         nome: Yup.string().max(255)
@@ -31,10 +36,18 @@ function EditarCliente(props) {
                             .required('Favor informar o nome completo'),
                         telefone: Yup.string().max(11,'Telefone tem mais de 11 dígitos.')
                             .required('Favor informar um Telefone. '),
-                        endereco: Yup.string()
-                            .min(20, 'O endereço precisa ter ao menos 20 caracteres.')
-                            .max(255)
-                            .required('Favor informar o endereço completo'),
+                        rua: Yup.string()
+                        .max(255)
+                        .required('Favor informar a rua.'),
+                        bairro: Yup.string()
+                            .max(50)
+                            .required('Favor informar o bairro.'),
+                        cidade: Yup.string()
+                        .max(50)
+                        .required('Favor informar a cidade.'),
+                        estado: Yup.string()
+                        .max(2,'Coloque somente a sigla do estado.')
+                        .required('Favor informar o estado.'),
                     })}
                     onSubmit={async (
                         values,
@@ -43,13 +56,17 @@ function EditarCliente(props) {
                         try {
                             await apiCliente.put(`/editarcliente`,{
                                 nome: values.nome,
-                                data_nascimento: values.data_nascimento,
                                 telefone: values.telefone,
-                                endereco: values.endereco,
+                                rua: values.rua,
+                                numero: values.numero,
+                                bairro: values.bairro,
+                                cidade: values.cidade,
+                                estado: values.estado,
                                 idCliente: cliente.idcliente
                             })
                             setStatus({ success: true });
                             setSubmitting(true);
+                            props.close()
                         } catch(error){
                             const message =
                             (error.response && error.response.data.message) ||
@@ -102,15 +119,75 @@ function EditarCliente(props) {
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="endereco"
-                                label="Endereço Completo"
-                                name="endereco"
-                                autoComplete="endereco"
+                                id="rua"
+                                label="Rua"
+                                name="rua"
+                                autoComplete="rua"
                                 autoFocus
-                                error={Boolean(errors.endereco)}
-                                value={values.endereco}
+                                error={Boolean(errors.rua)}
+                                value={values.rua}
                                 onChange={handleChange}
-                                helperText={errors.endereco}
+                                helperText={errors.rua}
+                            />
+                             <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="numero"
+                                label="Número"
+                                name="numero"
+                                autoComplete="numero"
+                                autoFocus
+                                error={Boolean(errors.numero)}
+                                value={values.numero}
+                                onChange={handleChange}
+                                helperText={errors.numero}
+                            />
+                             <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="bairro"
+                                label="Bairro"
+                                name="bairro"
+                                autoComplete="bairro"
+                                autoFocus
+                                error={Boolean(errors.bairro)}
+                                value={values.bairro}
+                                onChange={handleChange}
+                                helperText={errors.bairro}
+                            />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="cidade"
+                                label="Cidade"
+                                name="cidade"
+                                autoComplete="cidade"
+                                autoFocus
+                                error={Boolean(errors.cidade)}
+                                value={values.cidade}
+                                onChange={handleChange}
+                                helperText={errors.cidade}
+                            />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="estado"
+                                label="Estado"
+                                name="estado"
+                                autoComplete="estado"
+                                autoFocus
+                                error={Boolean(errors.estado)}
+                                value={values.estado}
+                                onChange={handleChange}
+                                helperText={errors.estado}
                             />
                             <Button
                                 fullWidth

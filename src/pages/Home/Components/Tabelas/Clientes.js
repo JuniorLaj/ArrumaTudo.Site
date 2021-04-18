@@ -13,6 +13,7 @@ import { Button, Dialog, DialogTitle,  } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import EditarCliente from '../Apresentação/EditarCliente';
 import CadastrarCliente from '../Cadastro/CadastrarCliente'
+import ModelOk from '../../../../models/modelOk';
 
 const useStyles = makeStyles({
     buttonAdd: {
@@ -25,22 +26,8 @@ const useStyles = makeStyles({
 
 function Clientes() {
     const classes = useStyles();
-    const [rows, setRows] = useState([])
-    const [openAddCliente,setOpenAddCliente] = useState()
     const dispatch = useDispatch()
-    const [open, setOpen] = useState()
-    const handleClickOpen = (tab) => {
-        dispatch({ type: 'selecionarCliente', payload: tab })
-        setOpen(true);
-    };
-    const handleClose = () => {
-        setOpenAddCliente(false)
-        setOpen(false);
-    };
-
-    const handleAdicionarCliente = () => {
-        setOpenAddCliente(true)
-    };
+    const [rows, setRows] = useState([])
 
     const getRows = useCallback(async () => {
         await apiCliente.get('/retornaclientes')
@@ -59,6 +46,49 @@ function Clientes() {
     }, [getRows])
 
 
+    /*Adicionar*/
+    const [openAddCliente,setOpenAddCliente] = useState()
+    const [openModelOkCreate, setOpenModelOkCreate] = useState(false)
+
+//#######################################################
+
+    const handleAdicionarCliente = () => {
+        setOpenAddCliente(true)
+    };
+
+    const handleCloseCreate = () => {
+        setOpenAddCliente(false)
+        setOpenModelOkCreate(true)
+    };
+
+    const handleCloseModelOkCreate = () => {
+        setOpenModelOkCreate(false);
+    };
+    
+//#######################################################
+
+    /*Editar*/
+    const [openEdit, setOpenEdit] = useState()
+    const [openModelOkEdit, setOpenModelOkEdit] = useState(false)
+
+//#######################################################
+
+    const handleClickOpenEdit = (tab) => {
+        dispatch({ type: 'selecionarCliente', payload: tab })
+        setOpenEdit(true);
+    };
+
+    const handleCloseEdit = () => {
+        setOpenEdit(false);
+        setOpenModelOkEdit(true);    
+    };
+
+    const handleCloseModelOkEdit = () => {
+        setOpenModelOkEdit(false);
+    };
+
+//#######################################################
+
     return(
         <>
         <div className={classes.buttonAdd}>
@@ -67,9 +97,14 @@ function Clientes() {
         </Button>
         </div>
         <Dialog open={openAddCliente} DialogContent={false}
-            onClose={handleClose} aria-labelledby="form-dialog-addCliente">
+            onClose={handleCloseCreate} aria-labelledby="form-dialog-addCliente">
             <DialogTitle id="customized-dialog-addCliente">Adicionar Cliente</DialogTitle>
-            <CadastrarCliente getRows = {()=>getRows()}/>
+            <CadastrarCliente close={handleCloseCreate} getRows = {()=>getRows()}/>
+        </Dialog>
+        <Dialog open={openModelOkCreate} DialogContent={false}
+            onClose={handleCloseModelOkCreate} aria-labelledby="form-sdialog-title">
+            <DialogTitle id="customized-dialosg-title">Adicionar Cliente</DialogTitle>
+            <ModelOk message ="Cliente adicionado com sucesso!" closeModel={handleCloseModelOkCreate}/>
         </Dialog>
         <TableContainer >
             <Table>
@@ -90,13 +125,14 @@ function Clientes() {
                             {/* <tr> */}
                             <TableCell>{tab.idcliente}</TableCell>
                             <TableCell>{tab.nome}</TableCell>
-                            <TableCell>{tab.endereco}</TableCell>
+                            <TableCell>{`Rua ${tab.rua}, nº ${tab.numero},
+                                         Bairro ${tab.bairro}, ${tab.cidade}-${tab.estado}`}</TableCell>
                             <TableCell>{tab.telefone}</TableCell>
                             <TableCell align='center'>
                                 {new Date(tab.data_nascimento).toLocaleDateString()}
                             </TableCell>
                             <TableCell align = 'center' >
-                                <Button onClick={() => handleClickOpen(tab)}>
+                                <Button onClick={() => handleClickOpenEdit(tab)}>
                                     <EditIcon  color='secondary'/>
                                 </Button>
                                 <Button onClick={async ()=>{
@@ -115,10 +151,15 @@ function Clientes() {
                             
                             </TableRow>
                     ))}
-                    <Dialog open={open} DialogContent={false}
-                        onClose={handleClose} aria-labelledby="form-dialog-title">
+                    <Dialog open={openEdit} DialogContent={false}
+                        onClose={handleCloseEdit} aria-labelledby="form-dialog-title">
                         <DialogTitle id="customized-dialog-title">Editar Cliente</DialogTitle>
-                        <EditarCliente getRows = {()=>getRows()}/>
+                        <EditarCliente close={() => handleCloseEdit()} getRows = {()=>getRows()}/>
+                    </Dialog>
+                    <Dialog open={openModelOkEdit} DialogContent={false}
+                        onClose={handleCloseModelOkEdit} aria-labelledby="form-sdialog-title">
+                        <DialogTitle id="customized-dialosg-title">Editar Cliente</DialogTitle>
+                        <ModelOk message ="Cliente editado com sucesso!" closeModel={handleCloseModelOkEdit}/>
                     </Dialog>
                 </TableBody>
             </Table>

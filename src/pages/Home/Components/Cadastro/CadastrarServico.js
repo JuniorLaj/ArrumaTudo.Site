@@ -4,9 +4,8 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 import apiCliente from '../../../../utils/apiCliente'
 import apiEquipamento from '../../../../utils/apiEquipamento'
+import { useSelector } from 'react-redux';
 
-
-// import { cadastrarServiço } from '../../../../actions/servicesActions';
 const UseStyles = makeStyles((theme) => ({
     formControl: {
         margin: theme.spacing(1),
@@ -22,9 +21,21 @@ const UseStyles = makeStyles((theme) => ({
 }))
 export default function CadastrarServico(props) {
     const classes = UseStyles();
+    const account = useSelector(state => state.account.user.data)
     const [rows, setRowsCliente] = useState([])
     const [tipos, setTipos] = useState([])
-    
+    const [clienteId,setClienteId] = useState()
+    const [type,setType] = useState()
+
+    const handleSelectedType = (tab) => {
+        setType(tab)
+    }
+
+    const handleSelectedCliente = (tab) => {
+        setClienteId(tab.idcliente)
+    }
+
+
     const getTipos = useCallback(async() => {
         await apiEquipamento.get('/retornatipos')
     .then(response => {
@@ -55,17 +66,10 @@ export default function CadastrarServico(props) {
             <Box display="flex" flexDirection="column" alignItems="center" mt={2}>
                 <Formik
                     initialValues={{
-                        cliente: '',
-                        tipo: '',
+                        modelo: '',
                         defeito: '',
                     }}
                     validationSchema={Yup.object().shape({
-                        cliente: Yup.string()
-                        .max(255)
-                        .required('Favor informar um cliente'),
-                        tipo: Yup.string().max(255)
-                            .min(4, 'O tipo precisa ter ao menos 5 caracteres.')
-                            .required('Favor informar o tipo.'),
                         defeito: Yup.string().max(255)
                             .required('Favor informar o texto explicando o defeito. '),
                     })}
@@ -75,12 +79,15 @@ export default function CadastrarServico(props) {
                     ) => {
                         try {
                             await apiEquipamento.post(`/adicionarequipamento`,{
-                                idCliente: values.idcliente,
-                                tipo: values.tipo,
+                                idCliente: clienteId,
+                                tipo: type,
+                                modelo: values.modelo,
                                 defeito: values.defeito,
+                                idFuncionario: account.idfuncionario,
                             })
                             setStatus({ success: true });
                             setSubmitting(true);
+                            props.close()
                         } catch(error){
                             const message =
                             (error.response && error.response.data.message) ||
@@ -108,7 +115,7 @@ export default function CadastrarServico(props) {
                                 renderValue={(value) => `${value.idcliente} - ${value.nome}`}
                                 >
                                  {rows.map((tab) => (
-                                    <MenuItem value={tab}>{tab.idcliente} - {tab.nome} </MenuItem>
+                                    <MenuItem onClick={handleSelectedCliente(tab)} value={tab}>{tab.idcliente} - {tab.nome} </MenuItem>
                                  ))}
                                 </Select>
                             </FormControl>
@@ -118,16 +125,32 @@ export default function CadastrarServico(props) {
                                 labelId="tipo"
                                 id="tipo"
                                 error={Boolean(errors.tipo)}
-                                value={values.tipo}
+                                value={type}
                                 helperText={errors.tipo}
                                 onChange={handleChange}
-                                renderValue={(value) => value}
                                 >
                                 {tipos.map((tab) => (
-                                    <MenuItem value={tab}>{tab} </MenuItem>
+                                    <MenuItem onClick={handleSelectedType(tab)} value={tab}>{tab}</MenuItem>
                                 ))}
                                 </Select>
                             </FormControl>
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                multiline
+                                rowsMax={4}
+                                id="modelo"
+                                label="Modelo"
+                                name="modelo"
+                                autoComplete="modelo"
+                                autoFocus
+                                error={Boolean(errors.modelo)}
+                                value={values.modelo}
+                                onChange={handleChange}
+                                helperText={errors.modelo}
+                            />
                             <TextField
                                 variant="outlined"
                                 margin="normal"
@@ -158,18 +181,9 @@ export default function CadastrarServico(props) {
                             {errors.submit && (
                                 <FormHelperText error>{errors.submit}</FormHelperText>
                             )}
-                            {/* <Grid container>
-                                <Grid item>
-                                    <Link>Esqueceu sua senha?</Link>
-                                </Grid>
-                                <Grid item>
-                                    <Link>Não tem uma conta? Registre-se</Link>
-                                </Grid>
-                            </Grid> */}
                         </form>
                     )}
                 </Formik>
-                {/* <Copyright /> */}
             </Box>
         </Grid>
     )

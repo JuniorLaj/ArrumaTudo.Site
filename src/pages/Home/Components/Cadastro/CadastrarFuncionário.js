@@ -4,7 +4,7 @@ import { Formik } from 'formik'
 import * as Yup from 'yup';
 import apiFuncionario from '../../../../utils/apiFuncionario'
 import { useSelector } from 'react-redux';
-// import { useNavigate } from 'react-router';
+
 const useStyles = makeStyles({
     textField: {
         marginRight:'20vh',
@@ -25,7 +25,11 @@ function CadastrarFuncionario(props) {
                     initialValues={{
                         cpf: '',
                         nome: '',
-                        endereco: '',
+                        rua: '',
+                        numero: '',
+                        bairro: '',
+                        cidade: '',
+                        estado: '',
                         telefone: '',
                         data_nascimento: '',
                         email: '',
@@ -38,10 +42,18 @@ function CadastrarFuncionario(props) {
                         .required('Informe seu CPF'),
                         nome: Yup.string().max(255)
                             .required('Favor informar o nome completo'),
-                        endereco: Yup.string()
-                            .min(20, 'O endereço precisa ter ao menos 20 caracteres.')
+                        rua: Yup.string()
+                        .max(255)
+                        .required('Favor informar a rua.'),
+                        bairro: Yup.string()
                             .max(255)
-                            .required('Favor informar o endereço completo'),
+                            .required('Favor informar o bairro.'),
+                        cidade: Yup.string()
+                        .max(255)
+                        .required('Favor informar a cidade.'),
+                        estado: Yup.string()
+                        .max(2,'Coloque somente a sigla do estado.')
+                        .required('Favor informar o estado.'),
                         telefone: Yup.string().max(11,'Telefone tem mais de 11 dígitos.')
                             .required('Favor informar um Telefone. '),
                         data_nascimento: Yup.string().required('Favor informar uma data de nascimento. '),
@@ -57,7 +69,11 @@ function CadastrarFuncionario(props) {
                             await apiFuncionario.post(`/adicionarfuncionario`,{
                                 cpf: values.cpf,
                                 nome: values.nome,
-                                endereco: values.endereco,
+                                rua: values.rua,
+                                numero: values.numero,
+                                bairro: values.bairro,
+                                cidade: values.cidade,
+                                estado: values.estado,
                                 telefone: values.telefone,
                                 dataNascimento: values.data_nascimento,
                                 email: values.email,
@@ -67,6 +83,7 @@ function CadastrarFuncionario(props) {
                             })
                             setStatus({ success: true });
                             setSubmitting(true);
+                            props.close()
                         } catch(error){
                             const message =
                             (error.response && error.response.data.message) ||
@@ -116,15 +133,75 @@ function CadastrarFuncionario(props) {
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="endereco"
-                                label="Endereço Completo"
-                                name="endereco"
-                                autoComplete="endereco"
+                                id="rua"
+                                label="Rua"
+                                name="rua"
+                                autoComplete="rua"
                                 autoFocus
-                                error={Boolean(errors.endereco)}
-                                value={values.endereco}
+                                error={Boolean(errors.rua)}
+                                value={values.rua}
                                 onChange={handleChange}
-                                helperText={errors.endereco}
+                                helperText={errors.rua}
+                            />
+                             <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="numero"
+                                label="Número"
+                                name="numero"
+                                autoComplete="numero"
+                                autoFocus
+                                error={Boolean(errors.numero)}
+                                value={values.numero}
+                                onChange={handleChange}
+                                helperText={errors.numero}
+                            />
+                             <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="bairro"
+                                label="Bairro"
+                                name="bairro"
+                                autoComplete="bairro"
+                                autoFocus
+                                error={Boolean(errors.bairro)}
+                                value={values.bairro}
+                                onChange={handleChange}
+                                helperText={errors.bairro}
+                            />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="cidade"
+                                label="Cidade"
+                                name="cidade"
+                                autoComplete="cidade"
+                                autoFocus
+                                error={Boolean(errors.cidade)}
+                                value={values.cidade}
+                                onChange={handleChange}
+                                helperText={errors.cidade}
+                            />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="estado"
+                                label="Estado"
+                                name="estado"
+                                autoComplete="estado"
+                                autoFocus
+                                error={Boolean(errors.estado)}
+                                value={values.estado}
+                                onChange={handleChange}
+                                helperText={errors.estado}
                             />
                             <TextField
                                 variant="outlined"

@@ -1,18 +1,11 @@
 import React from 'react'
-import { DialogContent, Box, Button,FormHelperText, TextField, Grid, makeStyles } from '@material-ui/core'
+import { DialogContent, Box, Button,FormHelperText, TextField, Grid } from '@material-ui/core'
 import { Formik } from 'formik'
 import * as Yup from 'yup';
 import { useSelector } from 'react-redux'
 import apiEquipamento from '../../../../utils/apiEquipamento'
 
-const useStyles = makeStyles({
-    textField: {
-        marginRight:'20vh',
-    },
-
-})
 function EditarServico(props) {
-    const classes = useStyles()
     const equipamento = useSelector(state => state.selectedItem.equipamento)
     console.log(equipamento)
     return (
@@ -21,13 +14,14 @@ function EditarServico(props) {
             <Box display="flex" alignItems="center" >
                 <Formik
                     initialValues={{
-                        idequipamento: equipamento.idequipamento,
                         tipo: equipamento.tipo.toString(),
+                        modelo: equipamento.modelo.toString(),
                         defeito: equipamento.defeito.toString(),
-                        data: new Date(equipamento.dataentrada.toString()),
                         status: equipamento.status,
                     }}
                     validationSchema={Yup.object().shape({
+                        modelo: Yup.string().max(50,'Máximo 50 caracteres neste campo.')
+                            .required('Favor informar o modelo do equipamento. '),
                         defeito: Yup.string().min(10).max(100,'Máximo 100 caracteres neste campo.')
                             .required('Favor informar o defeito. '),
                     })}
@@ -37,13 +31,14 @@ function EditarServico(props) {
                     ) => {
                         try {
                             await apiEquipamento.put(`/editarequipamento`,{
-                                tipo: values.tipo,
+                                modelo: values.modelo,
                                 defeito: values.defeito,
                                 status: values.status,
                                 idEquipamento: equipamento.idequipamento
                             })
                             setStatus({ success: true });
                             setSubmitting(true);
+                            props.close()
                         } catch(error){
                             const message =
                             (error.response && error.response.data.message) ||
@@ -73,26 +68,19 @@ function EditarServico(props) {
                                 <TextField
                                     variant="outlined"
                                     margin="normal"
-                                    required
-                                    type="date"
+                                    disabled
                                     id="data"
                                     label="Data de Entrada"
                                     name="data"
                                     autoComplete="data"
                                     autoFocus
-                                    error={Boolean(errors.data)}
-                                    value={values.data}
-                                    onChange={handleChange}
-                                    helperText={errors.data}
-                                    InputLabelProps={{
-                                        shrink: true,
-                                      }}
+                                    defaultValue={ new Date(equipamento.dataentrada).toLocaleDateString()}
                                 />
                             </div>
                             <TextField
                                 variant="outlined"
                                 margin="normal"
-                                required
+                                disabled
                                 fullWidth
                                 type='tipo'
                                 id="tipo"
@@ -107,6 +95,23 @@ function EditarServico(props) {
                                 InputLabelProps={{
                                     shrink: true,
                                   }}
+                            />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                multiline
+                                rowsMax={4}
+                                id="modelo"
+                                label="Modelo"
+                                name="modelo"
+                                autoComplete="modelo"
+                                autoFocus
+                                error={Boolean(errors.modelo)}
+                                value={values.modelo}
+                                onChange={handleChange}
+                                helperText={errors.modelo}
                             />
                             <TextField
                                 variant="outlined"

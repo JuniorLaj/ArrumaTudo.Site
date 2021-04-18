@@ -13,7 +13,8 @@ import { Button, Dialog, DialogTitle,  } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import EditarServico from '../Apresentação/EditarServico';
 import CadastrarServico from '../Cadastro/CadastrarServico'
-import { CheckCircleOutline, Done, HourglassEmpty } from '@material-ui/icons';
+import { CheckCircleOutline, HourglassEmpty } from '@material-ui/icons';
+import ModelOk from '../../../../models/modelOk';
 
 const useStyles = makeStyles({
     buttonAdd: {
@@ -26,24 +27,10 @@ const useStyles = makeStyles({
 
 function Servicos() {
     const classes = useStyles();
-    const [rows, setRows] = useState([])
-    const [openAddServico,setOpenAddServico] = useState()
-    const account = useSelector(state => state.account.user.data)
     const dispatch = useDispatch()
-    const [open, setOpen] = useState()
-    const handleClickOpen = (tab) => {
-        dispatch({ type: 'selecionarEquipamento', payload: tab })
-        setOpen(true);
-    };
-    const handleClose = () => {
-        setOpenAddServico(false)
-        setOpen(false);
-    };
+    const account = useSelector(state => state.account.user.data)
 
-    const handleAdicionarServico = () => {
-        setOpenAddServico(true)
-    };
-
+    const [rows, setRows] = useState([])
     const getRows = useCallback(async () => {
         await apiEquipamento.get(`/funcionarios/${account.idfuncionario}`)
             .then(response => {
@@ -53,12 +40,52 @@ function Servicos() {
             })
 
     }, [setRows])
-
     useEffect(() => {
         getRows()       
 
     }, [getRows])
 
+
+    /*Adicionar*/
+    const [openAddServico,setOpenAddServico] = useState()
+    const [openModelOkCreate, setOpenModelOkCreate] = useState(false)
+//#######################################################
+
+    const handleAdicionarServico = () => {
+        setOpenAddServico(true)
+    };
+
+    const handleCloseCreate = () => {
+        setOpenAddServico(false)
+        setOpenModelOkCreate(true)
+
+    };
+
+    const handleCloseModelOkCreate = () => {
+        setOpenModelOkCreate(false);
+    };
+//#######################################################
+
+    /*Editar*/
+    const [openEdit, setOpenEdit] = useState()
+    const [openModelOkEdit, setOpenModelOkEdit] = useState(false)
+
+//#######################################################
+
+    const handleClickOpenEdit = (tab) => {
+        dispatch({ type: 'selecionarEquipamento', payload: tab })
+        setOpenEdit(true);
+    };
+    const handleCloseEdit = () => {
+        setOpenEdit(false);
+        setOpenModelOkEdit(true);    
+    };
+
+    const handleCloseModelOkEdit = () => {
+        setOpenModelOkEdit(false);
+    };
+
+//#######################################################
 
     return(
         <>
@@ -68,9 +95,14 @@ function Servicos() {
         </Button>
         </div>
         <Dialog open={openAddServico} DialogContent={false}
-            onClose={handleClose} aria-labelledby="form-dialog-addFuncionario">
+            onClose={handleCloseCreate} aria-labelledby="form-dialog-addFuncionario">
             <DialogTitle id="customized-dialog-addFuncionario">Adicionar Serviço</DialogTitle>
-            <CadastrarServico getRows = {()=>getRows()}/>
+            <CadastrarServico close={handleCloseCreate} getRows = {()=>getRows()}/>
+        </Dialog>
+        <Dialog open={openModelOkCreate} DialogContent={false}
+            onClose={handleCloseModelOkCreate} aria-labelledby="form-sdialog-title">
+            <DialogTitle id="customized-dialosg-title">Adicionar Serviço</DialogTitle>
+            <ModelOk message ="Serviço adicionado com sucesso!" closeModel={handleCloseModelOkCreate}/>
         </Dialog>
         <TableContainer >
             <Table>
@@ -101,7 +133,7 @@ function Servicos() {
                             <HourglassEmpty/>
                             )}</TableCell>
                             <TableCell align = 'center' >
-                                <Button onClick={() => handleClickOpen(tab)}>
+                                <Button onClick={() => handleClickOpenEdit(tab)}>
                                     <EditIcon  color='secondary'/>
                                 </Button>
                                 <Button onClick={async ()=>{
@@ -117,13 +149,17 @@ function Servicos() {
                                     <DeleteIcon color='primary'/>
                                 </Button>
                             </TableCell>
-                            
-                            </TableRow>
+                        </TableRow>
                     ))}
-                    <Dialog open={open} DialogContent={false}
-                        onClose={handleClose} aria-labelledby="form-dialog-title">
+                    <Dialog open={openEdit} DialogContent={false}
+                        onClose={handleCloseEdit} aria-labelledby="form-dialog-title">
                         <DialogTitle id="customized-dialog-title">Editar Serviço</DialogTitle>
-                        <EditarServico getRows = {()=>getRows()}/>
+                        <EditarServico close ={() => handleCloseEdit()} getRows = {()=>getRows()}/>
+                    </Dialog>
+                    <Dialog open={openModelOkEdit} DialogContent={false}
+                        onClose={handleCloseModelOkEdit} aria-labelledby="form-sdialog-title">
+                        <DialogTitle id="customized-dialosg-title">Editar Serviço</DialogTitle>
+                        <ModelOk message ="Serviço editado com sucesso!" closeModel={handleCloseModelOkEdit}/>
                     </Dialog>
                 </TableBody>
             </Table>

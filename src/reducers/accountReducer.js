@@ -4,7 +4,6 @@ const INITIAL_STATE = {
     user: null
 }
 const accountReducer = (state = INITIAL_STATE, action) => {
-    // console.log({'action':action})
     switch (action.type) {
         case LOGIN_SUCESS: {
             return {
