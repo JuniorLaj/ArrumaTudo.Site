@@ -1,110 +1,168 @@
 import React from 'react'
-import { Box, Button, FormHelperText, Grid, makeStyles, TextField } from '@material-ui/core'
+import { DialogContent, Box, Button,FormHelperText, TextField, Grid, makeStyles } from '@material-ui/core'
+import { Formik } from 'formik'
 import * as Yup from 'yup';
-import { Formik } from 'formik';
-const UseStyles = makeStyles({
-
+import apiFuncionario from '../../../../utils/apiFuncionario'
+import { useSelector } from 'react-redux';
+// import { useNavigate } from 'react-router';
+const useStyles = makeStyles({
+    textField: {
+        marginRight:'20vh',
+    },
+    textData: {
+        flexDirection:'column',
+        float:'right',
+    }
 })
-export default function CadastrarFuncionário() {
-    const classes = UseStyles();
+function CadastrarFuncionario(props) {
+    const account = useSelector(state => state.account.user.data)
+    const classes = useStyles()
     return (
-        <Grid >
-            <Box display="flex" flexDirection="column" alignItems="center" mt={8}>
+        <DialogContent>
+            <Grid>
+            <Box display="flex" alignItems="center" >
                 <Formik
                     initialValues={{
-                        fullname: '',
-                        username: '',
-                        work: '',
+                        cpf: '',
+                        nome: '',
+                        endereco: '',
+                        telefone: '',
+                        data_nascimento: '',
                         email: '',
-                        password: '',
+                        senha: '',
+                        salario: '',
                     }}
                     validationSchema={Yup.object().shape({
-                        fullname: Yup.string().max(255)
-                            .min(10, 'O nome precisa ter ao menos 10 caracteres')
+                        cpf: Yup.string()
+                        .min(11,'CPF de 11 dígitos.')
+                        .required('Informe seu CPF'),
+                        nome: Yup.string().max(255)
                             .required('Favor informar o nome completo'),
-                        username: Yup.string().max(255)
-                            .required('Favor informar um UserName. '),
-                        work: Yup.string().max(255).required('Favor informar uma atividade. '),
-                        email: Yup.string()
-                            .email('Favor informar um email válido. ')
+                        endereco: Yup.string()
+                            .min(20, 'O endereço precisa ter ao menos 20 caracteres.')
                             .max(255)
-                            .required('Favor informar o email'),
-                        password: Yup.string()
-                            .max(255).min(7, 'O password precisa ter ao menos 7 caractéres. ')
-                            .required('Favor informar o password. '),
+                            .required('Favor informar o endereço completo'),
+                        telefone: Yup.string().max(11,'Telefone tem mais de 11 dígitos.')
+                            .required('Favor informar um Telefone. '),
+                        data_nascimento: Yup.string().required('Favor informar uma data de nascimento. '),
+                        email: Yup.string().max(50).min(20).required("Informe um email."),
+                        senha: Yup.string().max(10,'Máximo 10 caracteres na senha.')
+                        .min(5, 'Mínimo 5 caracteres na senha.').required('Favor informar uma senha.')
                     })}
                     onSubmit={async (
                         values,
                         { setErrors, setStatus, setSubmitting },
                     ) => {
                         try {
-                            // await dispatch(signUp(values.fullname, values.username, values.work, values.email, values.password));
-                            // navigate('/');
-                        } catch (error) {
+                            await apiFuncionario.post(`/adicionarfuncionario`,{
+                                cpf: values.cpf,
+                                nome: values.nome,
+                                endereco: values.endereco,
+                                telefone: values.telefone,
+                                dataNascimento: values.data_nascimento,
+                                email: values.email,
+                                senha: values.senha,
+                                salario: values.salario,
+                                idGerente: account.idgerente
+                            })
+                            setStatus({ success: true });
+                            setSubmitting(true);
+                        } catch(error){
                             const message =
-                                (error.response && error.response.data.message) ||
-                                'Alguma coisa aconteceu';
-
+                            (error.response && error.response.data.message) ||
+                            'Alguma coisa aconteceu';
                             setStatus({ success: false });
                             setErrors({ submit: message });
                             setSubmitting(false);
+                        }finally {
+                            props.getRows()
                         }
                     }}
                 >
                     {({ errors, handleChange, handleSubmit, isSubmitting, values }) => (
-                        <form noValidate className={classes.form} onSubmit={handleSubmit}>
+                        <form noValidate  onSubmit={handleSubmit}>
                             <TextField
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                fullWidth
-                                id="fullname"
-                                label="fullname"
-                                name="fullname"
-                                autoComplete="fullname"
+                                id="cpf"
+                                label="CPF (somente dígitos)"
+                                name="cpf"
+                                autoComplete="cpf"
                                 autoFocus
-                                error={Boolean(errors.fullname)}
-                                value={values.fullname}
+                                error={Boolean(errors.cpf)}
+                                value={values.cpf}
                                 onChange={handleChange}
-                                helperText={errors.fullname}
+                                helperText={errors.cpf}
                             />
                             <TextField
                                 variant="outlined"
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="username"
-                                label="UserName"
-                                name="username"
-                                autoComplete="username"
+                                className={classes.textField}
+                                id="nome"
+                                label="Nome Completo"
+                                name="nome"
+                                autoComplete="nome"
                                 autoFocus
-                                error={Boolean(errors.username)}
-                                value={values.username}
+                                error={Boolean(errors.nome)}
+                                value={values.nome}
                                 onChange={handleChange}
-                                helperText={errors.username}
+                                helperText={errors.nome}
                             />
                             <TextField
                                 variant="outlined"
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="work"
-                                label="Área de Trabalho"
-                                name="work"
-                                autoComplete="work"
+                                id="endereco"
+                                label="Endereço Completo"
+                                name="endereco"
+                                autoComplete="endereco"
                                 autoFocus
-                                error={Boolean(errors.work)}
-                                value={values.work}
+                                error={Boolean(errors.endereco)}
+                                value={values.endereco}
                                 onChange={handleChange}
-                                helperText={errors.work}
+                                helperText={errors.endereco}
                             />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                id="telefone"
+                                label="Telefone para contato"
+                                name="telefone"
+                                autoComplete="Telefone"
+                                autoFocus
+                                error={Boolean(errors.telefone)}
+                                value={values.telefone}
+                                onChange={handleChange}
+                                helperText={errors.telefone}
+                                />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                type='date'
+                                id="data_nascimento"
+                                label="Data de Nascimento"
+                                name="data_nascimento"
+                                autoComplete="Data de Nascimento"
+                                autoFocus
+                                error={Boolean(errors.data_nascimento)}
+                                value={values.data_nascimento}
+                                onChange={handleChange}
+                                helperText={errors.data_nascimento}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                />
                             <TextField
                                 variant="outlined"
                                 margin="normal"
                                 required
                                 fullWidth
                                 id="email"
-                                label="E-mail"
+                                label="Email"
                                 name="email"
                                 autoComplete="email"
                                 autoFocus
@@ -118,42 +176,51 @@ export default function CadastrarFuncionário() {
                                 margin="normal"
                                 required
                                 fullWidth
-                                name="password"
-                                label="Senha"
                                 type="password"
-                                id="password"
-                                autoComplete="current-password"
-                                value={values.password}
+                                id="senha"
+                                label="Senha"
+                                name="senha"
+                                autoComplete="senha"
+                                autoFocus
+                                error={Boolean(errors.senha)}
+                                value={values.senha}
                                 onChange={handleChange}
-                                error={Boolean(errors.password)}
-                                helperText={errors.password}
+                                helperText={errors.senha}
+                            />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                id="salario"
+                                label="Salário"
+                                name="salario"
+                                autoComplete="salario"
+                                autoFocus
+                                error={Boolean(errors.salario)}
+                                value={values.salario}
+                                onChange={handleChange}
+                                helperText={errors.salario}
                             />
                             <Button
                                 fullWidth
                                 variant="contained"
                                 color="primary"
-                                className={classes.button}
+                                // className={classes.button}
                                 type="submit"
                                 disbled={isSubmitting}
                             >
-                                Cadastrar
-                </Button>
+                                CADASTRAR FUNCIONÁRIO
+                            </Button>
                             {errors.submit && (
                                 <FormHelperText error>{errors.submit}</FormHelperText>
                             )}
-                            {/* <Grid container>
-                                <Grid item>
-                                    <Link>Esqueceu sua senha?</Link>
-                                </Grid>
-                                <Grid item>
-                                    <Link>Não tem uma conta? Registre-se</Link>
-                                </Grid>
-                            </Grid> */}
                         </form>
                     )}
                 </Formik>
-                {/* <Copyright /> */}
             </Box>
-        </Grid>
+            </Grid>
+
+        </DialogContent>
     )
 }
+export default CadastrarFuncionario

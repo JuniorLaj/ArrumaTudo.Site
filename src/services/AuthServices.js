@@ -2,7 +2,6 @@ import apiFuncionario from '../utils/apiFuncionario'
 
 class AuthServices {
     //outras funções
-
     signIn = (email, password) => {
 
         // pesquisar sobre: "promisse javascript"
@@ -11,7 +10,7 @@ class AuthServices {
             apiFuncionario.post('/auth/login', { email, password })
             .then(response => {
                     if (response.data.user) {
-                        console.log(response)
+                        console.log("LOGIN",response)
                         resolve(response.data.user)
                     } else {
                         reject(response.data.error)

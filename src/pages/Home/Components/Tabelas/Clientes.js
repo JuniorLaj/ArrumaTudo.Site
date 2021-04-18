@@ -75,7 +75,7 @@ function Clientes() {
             <Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell>CPF</TableCell>
+                        <TableCell>ID</TableCell>
                         <TableCell>NOME</TableCell>
                         <TableCell>ENDEREÇO</TableCell>
                         <TableCell>TELEFONE</TableCell>
@@ -88,7 +88,7 @@ function Clientes() {
                     rows.map((tab) => (
                         <TableRow>
                             {/* <tr> */}
-                            <TableCell>{tab.cpf}</TableCell>
+                            <TableCell>{tab.idcliente}</TableCell>
                             <TableCell>{tab.nome}</TableCell>
                             <TableCell>{tab.endereco}</TableCell>
                             <TableCell>{tab.telefone}</TableCell>
@@ -101,7 +101,7 @@ function Clientes() {
                                 </Button>
                                 <Button onClick={async ()=>{
                                     try{
-                                        await apiCliente.delete(`/deletecliente/${tab.cpf}`)
+                                        await apiCliente.delete(`/deletecliente/${tab.idcliente}`)
                                     }catch(error){
                                         console.log(error)
                                     }finally{

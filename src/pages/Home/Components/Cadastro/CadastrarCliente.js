@@ -25,7 +25,10 @@ function CadastrarCliente(props) {
                         endereco: '',
                     }}
                     validationSchema={Yup.object().shape({
-                        nome: Yup.string().max(255)
+                        cpf: Yup.string()
+                        .min(11,'CPF de 11 dígitos.')
+                        .required('Informe seu CPF'),
+                        nome: Yup.string().max(50)
                             .min(10, 'O nome precisa ter ao menos 10 caracteres')
                             .required('Favor informar o nome completo'),
                         telefone: Yup.string().max(11,'Telefone tem mais de 11 dígitos.')
@@ -110,6 +113,9 @@ function CadastrarCliente(props) {
                                 value={values.data_nascimento}
                                 onChange={handleChange}
                                 helperText={errors.data_nascimento}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
                             />
                             </div>
                             <TextField

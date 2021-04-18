@@ -3,7 +3,6 @@ import { DialogContent, Box, Button,FormHelperText, TextField, Grid, makeStyles 
 import { Formik } from 'formik'
 import * as Yup from 'yup';
 import { useSelector } from 'react-redux'
-import {KeyboardDatePicker} from '@material-ui/pickers'
 import apiCliente from '../../../../utils/apiCliente'
 // import { useNavigate } from 'react-router';
 const useStyles = makeStyles({
@@ -15,7 +14,6 @@ const useStyles = makeStyles({
 function EditarCliente(props) {
     const classes = useStyles()
     const cliente = useSelector(state=> state.selectedItem.cliente)
-    console.log(cliente)
     return (
         <DialogContent>
             <Grid>
@@ -25,7 +23,6 @@ function EditarCliente(props) {
                         cpf: cliente.cpf,
                         nome: cliente.nome.toString(),
                         telefone: cliente.telefone.toString(),
-                        data_nascimento: new Date(cliente.data_nascimento).toLocaleDateString(),
                         endereco: cliente.endereco.toString(),
                     }}
                     validationSchema={Yup.object().shape({
@@ -34,7 +31,6 @@ function EditarCliente(props) {
                             .required('Favor informar o nome completo'),
                         telefone: Yup.string().max(11,'Telefone tem mais de 11 dígitos.')
                             .required('Favor informar um Telefone. '),
-                        data_nascimento: Yup.string().required('Favor informar uma data de nascimento. '),
                         endereco: Yup.string()
                             .min(20, 'O endereço precisa ter ao menos 20 caracteres.')
                             .max(255)
@@ -50,7 +46,7 @@ function EditarCliente(props) {
                                 data_nascimento: values.data_nascimento,
                                 telefone: values.telefone,
                                 endereco: values.endereco,
-                                cpf: cliente.cpf
+                                idCliente: cliente.idcliente
                             })
                             setStatus({ success: true });
                             setSubmitting(true);
@@ -68,19 +64,7 @@ function EditarCliente(props) {
                 >
                     {({ errors, handleChange, handleSubmit, isSubmitting, values }) => (
                         <form noValidate  onSubmit={handleSubmit}>
-                             <TextField
-                                variant="outlined"
-                                margin="normal"
-                                disabled
-                                id="cpf"
-                                label="CPF"
-                                name="cpf"
-                                autoComplete="cpf"
-                                autoFocus
-                                defaultValue={cliente.cpf}
-                            />
                             <div>
-
                             <TextField
                                 variant="outlined"
                                 margin="normal"
@@ -97,26 +81,6 @@ function EditarCliente(props) {
                                 helperText={errors.nome}
                             />
                             {/* <div className={classes.space}/> */}
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                type='date'
-                                id="data_nascimento"
-                                label="Data de Nascimento"
-                                name="data_nascimento"
-                                autoComplete="Data de Nascimento"
-                                // format="dd/MM/yyyy"
-                                autoFocus
-                                // defaultValue={new Date(cliente.data_nascimento)}
-                                error={Boolean(errors.data_nascimento)}
-                                value={values.data_nascimento}
-                                onChange={handleChange}
-                                helperText={errors.data_nascimento}
-                                InputLabelProps={{
-                                    shrink: true,
-                                  }}
-                            />
                             </div>
                             <TextField
                                 variant="outlined"

@@ -4,12 +4,12 @@ const INITIAL_STATE = {
 }
 const selectedItemTable = (state = INITIAL_STATE, action) => {
     switch (action.type) {
-        case ("selecionarEquip"): {
+        case ("selecionarEquipamento"): {
             return {
                 ...state,
                 equipamento: action.payload
             }
-        } case ("selecionarFunc"): {
+        } case ("selecionarFuncionario"): {
             return {
                 ...state,
                 funcionario: action.payload

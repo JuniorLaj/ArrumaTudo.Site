@@ -32,6 +32,7 @@ function Funcionarios() {
     const [open, setOpen] = useState()
     const handleClickOpen = (tab) => {
         dispatch({ type: 'selecionarFuncionario', payload: tab })
+        console.log(tab)
         setOpen(true);
     };
     const handleClose = () => {
@@ -44,7 +45,7 @@ function Funcionarios() {
     };
 
     const getRows = useCallback(async () => {
-        await apiFuncionario.get(`/funcionarios/${account.cpf_gerente}`)
+        await apiFuncionario.get(`/funcionarios/${account.idgerente}`)
             .then(response => {
                 setRows(response.data)
             }).catch(error => {
@@ -80,6 +81,7 @@ function Funcionarios() {
                         <TableCell>ENDEREÇO</TableCell>
                         <TableCell>TELEFONE</TableCell>
                         <TableCell align= 'center'>DATA DE NASCIMENTO</TableCell>
+                        <TableCell>SALÁRIO R$</TableCell>
                         <TableCell align = 'center'>OPÇÕES</TableCell>
                     </TableRow>
                 </TableHead>
@@ -88,20 +90,21 @@ function Funcionarios() {
                     rows.map((tab) => (
                         <TableRow>
                             {/* <tr> */}
-                            <TableCell>{tab.cpf}</TableCell>
+                            <TableCell>{tab.idfuncionario}</TableCell>
                             <TableCell>{tab.nome}</TableCell>
                             <TableCell>{tab.endereco}</TableCell>
                             <TableCell>{tab.telefone}</TableCell>
                             <TableCell align='center'>
-                                {new Date(tab.data_nascimento).toLocaleDateString()}
+                                {new Date(tab.datanascimento).toLocaleDateString()}
                             </TableCell>
+                            <TableCell>{tab.salario}</TableCell>
                             <TableCell align = 'center' >
                                 <Button onClick={() => handleClickOpen(tab)}>
                                     <EditIcon  color='secondary'/>
                                 </Button>
                                 <Button onClick={async ()=>{
                                     try{
-                                        await apiFuncionario.delete(`/deleteFuncionario/${tab.cpf}`)
+                                        await apiFuncionario.delete(`/deletarfuncionario/${tab.idfuncionario}`)
                                     }catch(error){
                                         console.log(error)
                                     }finally{

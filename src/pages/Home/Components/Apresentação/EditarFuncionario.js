@@ -3,7 +3,6 @@ import { DialogContent, Box, Button,FormHelperText, TextField, Grid, makeStyles 
 import { Formik } from 'formik'
 import * as Yup from 'yup';
 import { useSelector } from 'react-redux'
-import {KeyboardDatePicker} from '@material-ui/pickers'
 import apiFuncionario from '../../../../utils/apiFuncionario'
 // import { useNavigate } from 'react-router';
 const useStyles = makeStyles({
@@ -14,155 +13,134 @@ const useStyles = makeStyles({
 })
 function EditarFuncionario(props) {
     const classes = useStyles()
-    const Funcionario = useSelector(state=> state.selectedItem.Funcionario)
-    console.log(Funcionario)
+    const funcionario = useSelector(state=> state.selectedItem.funcionario)
     return (
         <DialogContent>
             <Grid>
-            <Box display="flex" flexDirection="column" alignItems="center" mt={8}>
+            <Box display="flex" alignItems="center" >
                 <Formik
                     initialValues={{
-                        fullname: '',
-                        username: '',
-                        work: '',
-                        email: '',
-                        password: '',
+                        nome: funcionario.nome.toString(),
+                        endereco: funcionario.endereco.toString(),
+                        telefone: funcionario.telefone.toString(),
+                        data_nascimento: new Date(funcionario.data_nascimento).toLocaleDateString(),
+                        salario: funcionario.salario,
                     }}
                     validationSchema={Yup.object().shape({
-                        fullname: Yup.string().max(255)
+                        nome: Yup.string().max(255)
                             .min(10, 'O nome precisa ter ao menos 10 caracteres')
                             .required('Favor informar o nome completo'),
-                        username: Yup.string().max(255)
-                            .required('Favor informar um UserName. '),
-                        work: Yup.string().max(255).required('Favor informar uma atividade. '),
-                        email: Yup.string()
-                            .email('Favor informar um email válido. ')
+                        telefone: Yup.string().max(11,'Telefone tem mais de 11 dígitos.')
+                            .required('Favor informar um Telefone. '),
+                        endereco: Yup.string()
+                            .min(20, 'O endereço precisa ter ao menos 20 caracteres.')
                             .max(255)
-                            .required('Favor informar o email'),
-                        password: Yup.string()
-                            .max(255).min(7, 'O password precisa ter ao menos 7 caractéres. ')
-                            .required('Favor informar o password. '),
+                            .required('Favor informar o endereço completo'),
                     })}
                     onSubmit={async (
                         values,
                         { setErrors, setStatus, setSubmitting },
                     ) => {
                         try {
-                            // await dispatch(signUp(values.fullname, values.username, values.work, values.email, values.password));
-                            // navigate('/');
-                        } catch (error) {
+                            await apiFuncionario.put(`/editarfuncionario`,{
+                                nome: values.nome,
+                                endereco: values.endereco,
+                                telefone: values.telefone,
+                                salario: values.salario,
+                                idFuncionario: funcionario.idfuncionario
+                            })
+                            setStatus({ success: true });
+                            setSubmitting(true);
+                        } catch(error){
                             const message =
-                                (error.response && error.response.data.message) ||
-                                'Alguma coisa aconteceu';
-
+                            (error.response && error.response.data.message) ||
+                            'Alguma coisa aconteceu';
                             setStatus({ success: false });
                             setErrors({ submit: message });
                             setSubmitting(false);
+                        }finally {
+                            props.getRows()
                         }
                     }}
                 >
                     {({ errors, handleChange, handleSubmit, isSubmitting, values }) => (
-                        <form noValidate className={classes.form} onSubmit={handleSubmit}>
-                            <TextField
+                        <form noValidate  onSubmit={handleSubmit}>
+                             <TextField
                                 variant="outlined"
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="fullname"
-                                label="fullname"
-                                name="fullname"
-                                autoComplete="fullname"
+                                className={classes.textField}
+                                id="nome"
+                                label="Nome Completo"
+                                name="nome"
+                                autoComplete="nome"
                                 autoFocus
-                                error={Boolean(errors.fullname)}
-                                value={values.fullname}
+                                error={Boolean(errors.nome)}
+                                value={values.nome}
                                 onChange={handleChange}
-                                helperText={errors.fullname}
+                                helperText={errors.nome}
                             />
                             <TextField
                                 variant="outlined"
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="username"
-                                label="UserName"
-                                name="username"
-                                autoComplete="username"
+                                id="endereco"
+                                label="Endereço Completo"
+                                name="endereco"
+                                autoComplete="endereco"
                                 autoFocus
-                                error={Boolean(errors.username)}
-                                value={values.username}
+                                error={Boolean(errors.endereco)}
+                                value={values.endereco}
                                 onChange={handleChange}
-                                helperText={errors.username}
+                                helperText={errors.endereco}
                             />
                             <TextField
                                 variant="outlined"
                                 margin="normal"
-                                required
-                                fullWidth
-                                id="work"
-                                label="Área de Trabalho"
-                                name="work"
-                                autoComplete="work"
+                                id="telefone"
+                                label="Telefone para contato"
+                                name="telefone"
+                                autoComplete="Telefone"
                                 autoFocus
-                                error={Boolean(errors.work)}
-                                value={values.work}
+                                error={Boolean(errors.telefone)}
+                                value={values.telefone}
                                 onChange={handleChange}
-                                helperText={errors.work}
-                            />
+                                helperText={errors.telefone}
+                                />
+                            <div>
                             <TextField
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                fullWidth
-                                id="email"
-                                label="E-mail"
-                                name="email"
-                                autoComplete="email"
+                                id="salario"
+                                label="Salário"
+                                name="salario"
+                                autoComplete="salario"
                                 autoFocus
-                                error={Boolean(errors.email)}
-                                value={values.email}
+                                error={Boolean(errors.salario)}
+                                value={values.salario}
                                 onChange={handleChange}
-                                helperText={errors.email}
+                                helperText={errors.salario}
                             />
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
-                                name="password"
-                                label="Senha"
-                                type="password"
-                                id="password"
-                                autoComplete="current-password"
-                                value={values.password}
-                                onChange={handleChange}
-                                error={Boolean(errors.password)}
-                                helperText={errors.password}
-                            />
+                            </div>
                             <Button
                                 fullWidth
                                 variant="contained"
                                 color="primary"
-                                className={classes.button}
+                                // className={classes.button}
                                 type="submit"
                                 disbled={isSubmitting}
                             >
                                 Editar
-                </Button>
+                            </Button>
                             {errors.submit && (
                                 <FormHelperText error>{errors.submit}</FormHelperText>
                             )}
-                            {/* <Grid container>
-                                <Grid item>
-                                    <Link>Esqueceu sua senha?</Link>
-                                </Grid>
-                                <Grid item>
-                                    <Link>Não tem uma conta? Registre-se</Link>
-                                </Grid>
-                            </Grid> */}
                         </form>
                     )}
                 </Formik>
-                {/* <Copyright /> */}
             </Box>
             </Grid>
 

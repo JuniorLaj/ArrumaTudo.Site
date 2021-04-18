@@ -6,6 +6,7 @@ import './mock'
 import HomeCliente from './pages/HomeCliente';
 import GuestRoute from './routes/guestRoute';
 import store from './store'
+import AcessoPedidos from './pages/HomeCliente/AcessoPedidos';
 function App() {
   return (
     <Provider store={store}>
@@ -13,6 +14,7 @@ function App() {
       <Routes>
       <GuestRoute path="//*" element={<HomeCliente />} />
       <GuestRoute path="/home" element={<Home />} />
+      <GuestRoute path="/acessopedidos" element={<AcessoPedidos/>} />
       </Routes>
       </BrowserRouter>
     </Provider>

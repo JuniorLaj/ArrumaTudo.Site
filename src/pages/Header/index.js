@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react'
-import { Box, makeStyles, Typography, Avatar, AppBar, Toolbar, Menu, MenuItem } from '@material-ui/core'
+import { Box, makeStyles, Typography, Avatar, AppBar, Toolbar, Menu, MenuItem, Button } from '@material-ui/core'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router'
 
 
 const useStyles = makeStyles({
@@ -24,6 +25,7 @@ function Header() {
     const classes = useStyles()
     const [isOpen, setisOpen] = useState(false)
     const ref = useRef()
+    const navigate = useNavigate()
     const account = useSelector(state => state.account.user.data)
     const handleOpen = () => {
         setisOpen(true)
@@ -37,27 +39,22 @@ function Header() {
 
             <AppBar style={{ boxShadow: 'none' }} position="fixed" color="inherit">
                 <Toolbar>
-                    <div>
+                    <Button onClick={() => navigate("/")}>
                         <h2> ARRUMA TUDO</h2>
-                    </div>
+                    </Button>
                     <div></div>
                     <div className={classes.grow} />
                     <div>
                         <Typography variant="body1">{account.nome}</Typography>
-                        <Typography variant="">{account.cpf === account.cpf_gerente? 'Gerente' : 'Funcionario'}</Typography>
+                        <Typography variant="">{account.idfuncionario === account.idgerente? 'Gerente' : 'Funcionario'}</Typography>
                     </div>
                     <div className={classes.userSection}>
                         <Box ml={2} />
-                        {/* <SvgIcon className={classes.bell}>
-                <Bell></Bell>
-            </SvgIcon> */}
-
                         <Avatar
                             ref={ref}
                             onClick={handleOpen}
-                            alt={account.nome} //account.name
+                            alt={account.nome} 
                             src='/'
-                        // src={account.user && account.user.avatar}
                         >
                         </Avatar>
 
@@ -73,7 +70,7 @@ function Header() {
                                 return false
                             }}
                         >
-                            <MenuItem /*onClick={handleSignOut}*/>Deslogar</MenuItem>
+                            <MenuItem onClick={() => navigate("/")}>Deslogar</MenuItem>
                         </Menu>
                     </div>
 
