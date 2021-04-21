@@ -2,8 +2,8 @@ import React, {useState, useCallback, useEffect} from 'react'
 import { Box, Button, FormControl, FormHelperText, Grid, InputLabel, makeStyles, MenuItem, Select, TextField } from '@material-ui/core'
 import * as Yup from 'yup';
 import { Formik } from 'formik';
-import apiCliente from '../../../../utils/apiCliente'
-import apiEquipamento from '../../../../utils/apiEquipamento'
+import apiCliente from '../../../utils/apiCliente'
+import apiEquipamento from '../../../utils/apiEquipamento'
 import { useSelector } from 'react-redux';
 
 const UseStyles = makeStyles((theme) => ({
@@ -63,7 +63,7 @@ export default function CadastrarServico(props) {
     }, [getRowsCliente,getTipos])
     return (
         <Grid >
-            <Box display="flex" flexDirection="column" alignItems="center" mt={2}>
+            <Box display="flex" alignItems="center" mt={2}>
                 <Formik
                     initialValues={{
                         modelo: '',

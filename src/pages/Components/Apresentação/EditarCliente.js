@@ -2,84 +2,68 @@ import React from 'react'
 import { DialogContent, Box, Button,FormHelperText, TextField, Grid, makeStyles } from '@material-ui/core'
 import { Formik } from 'formik'
 import * as Yup from 'yup';
-import apiFuncionario from '../../../../utils/apiFuncionario'
-import { useSelector } from 'react-redux';
+import { useSelector } from 'react-redux'
+import apiCliente from '../../../utils/apiCliente'
 
-const useStyles = makeStyles({
+
+const useStyles = makeStyles((theme) => ({
     textField: {
-        marginRight:'20vh',
+        marginRight: theme.spacing(10)
     },
-    textData: {
-        flexDirection:'column',
-        float:'right',
-    }
-})
-function CadastrarFuncionario(props) {
-    const account = useSelector(state => state.account.user.data)
+}))
+
+function EditarCliente(props) {
     const classes = useStyles()
+    const cliente = useSelector(state=> state.selectedItem.cliente)
+    console.log(cliente)
     return (
         <DialogContent>
             <Grid>
             <Box display="flex" alignItems="center" >
                 <Formik
                     initialValues={{
-                        cpf: '',
-                        nome: '',
-                        rua: '',
-                        numero: '',
-                        bairro: '',
-                        cidade: '',
-                        estado: '',
-                        telefone: '',
-                        data_nascimento: '',
-                        email: '',
-                        senha: '',
-                        salario: '',
+                        cpf: cliente.cpf.toString(),
+                        nome: cliente.nome.toString(),
+                        telefone: cliente.telefone.toString(),
+                        rua: cliente.rua.toString(),
+                        numero: cliente.numero,
+                        bairro: cliente.bairro.toString(),
+                        cidade: cliente.cidade.toString(),
+                        estado: cliente.estado.toString(),
                     }}
                     validationSchema={Yup.object().shape({
-                        cpf: Yup.string()
-                        .min(11,'CPF de 11 dígitos.')
-                        .required('Informe seu CPF'),
                         nome: Yup.string().max(255)
+                            .min(10, 'O nome precisa ter ao menos 10 caracteres')
                             .required('Favor informar o nome completo'),
+                        telefone: Yup.string().max(11,'Telefone tem mais de 11 dígitos.')
+                            .required('Favor informar um Telefone. '),
                         rua: Yup.string()
                         .max(255)
                         .required('Favor informar a rua.'),
                         bairro: Yup.string()
-                            .max(255)
+                            .max(50)
                             .required('Favor informar o bairro.'),
                         cidade: Yup.string()
-                        .max(255)
+                        .max(50)
                         .required('Favor informar a cidade.'),
                         estado: Yup.string()
                         .max(2,'Coloque somente a sigla do estado.')
                         .required('Favor informar o estado.'),
-                        telefone: Yup.string().max(11,'Telefone tem mais de 11 dígitos.')
-                            .required('Favor informar um Telefone. '),
-                        data_nascimento: Yup.string().required('Favor informar uma data de nascimento. '),
-                        email: Yup.string().max(50).min(20).required("Informe um email."),
-                        senha: Yup.string().max(10,'Máximo 10 caracteres na senha.')
-                        .min(5, 'Mínimo 5 caracteres na senha.').required('Favor informar uma senha.')
                     })}
                     onSubmit={async (
                         values,
                         { setErrors, setStatus, setSubmitting },
                     ) => {
                         try {
-                            await apiFuncionario.post(`/adicionarfuncionario`,{
-                                cpf: values.cpf,
+                            await apiCliente.put(`/editarcliente`,{
                                 nome: values.nome,
+                                telefone: values.telefone,
                                 rua: values.rua,
                                 numero: values.numero,
                                 bairro: values.bairro,
                                 cidade: values.cidade,
                                 estado: values.estado,
-                                telefone: values.telefone,
-                                dataNascimento: values.data_nascimento,
-                                email: values.email,
-                                senha: values.senha,
-                                salario: values.salario,
-                                idGerente: account.idgerente
+                                idCliente: cliente.idcliente
                             })
                             setStatus({ success: true });
                             setSubmitting(true);
@@ -98,28 +82,14 @@ function CadastrarFuncionario(props) {
                 >
                     {({ errors, handleChange, handleSubmit, isSubmitting, values }) => (
                         <form noValidate  onSubmit={handleSubmit}>
+                            <div>
                             <TextField
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                id="cpf"
-                                label="CPF (somente dígitos)"
-                                name="cpf"
-                                autoComplete="cpf"
-                                autoFocus
-                                error={Boolean(errors.cpf)}
-                                value={values.cpf}
-                                onChange={handleChange}
-                                helperText={errors.cpf}
-                            />
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
                                 className={classes.textField}
                                 id="nome"
-                                label="Nome Completo"
+                                label="Nome completo"
                                 name="nome"
                                 autoComplete="nome"
                                 autoFocus
@@ -128,6 +98,36 @@ function CadastrarFuncionario(props) {
                                 onChange={handleChange}
                                 helperText={errors.nome}
                             />
+                             <TextField
+                                variant="outlined"
+                                margin="normal"
+                                disabled
+                                id="cpf"
+                                label="CPF"
+                                name="cpf"
+                                autoComplete="cpf"
+                                autoFocus
+                                error={Boolean(errors.cpf)}
+                                value={values.cpf}
+                                onChange={handleChange}
+                                helperText={errors.cpf}
+                            />
+                            </div>
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                id="telefone"
+                                label="Telefone para contato"
+                                name="telefone"
+                                autoComplete="Telefone"
+                                autoFocus
+                                error={Boolean(errors.telefone)}
+                                value={values.telefone}
+                                onChange={handleChange}
+                                helperText={errors.telefone}
+                            />
+                            
                             <TextField
                                 variant="outlined"
                                 margin="normal"
@@ -203,81 +203,6 @@ function CadastrarFuncionario(props) {
                                 onChange={handleChange}
                                 helperText={errors.estado}
                             />
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                id="telefone"
-                                label="Telefone para contato"
-                                name="telefone"
-                                autoComplete="Telefone"
-                                autoFocus
-                                error={Boolean(errors.telefone)}
-                                value={values.telefone}
-                                onChange={handleChange}
-                                helperText={errors.telefone}
-                                />
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                type='date'
-                                id="data_nascimento"
-                                label="Data de Nascimento"
-                                name="data_nascimento"
-                                autoComplete="Data de Nascimento"
-                                autoFocus
-                                error={Boolean(errors.data_nascimento)}
-                                value={values.data_nascimento}
-                                onChange={handleChange}
-                                helperText={errors.data_nascimento}
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                                />
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="email"
-                                label="Email"
-                                name="email"
-                                autoComplete="email"
-                                autoFocus
-                                error={Boolean(errors.email)}
-                                value={values.email}
-                                onChange={handleChange}
-                                helperText={errors.email}
-                            />
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
-                                type="password"
-                                id="senha"
-                                label="Senha"
-                                name="senha"
-                                autoComplete="senha"
-                                autoFocus
-                                error={Boolean(errors.senha)}
-                                value={values.senha}
-                                onChange={handleChange}
-                                helperText={errors.senha}
-                            />
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                id="salario"
-                                label="Salário"
-                                name="salario"
-                                autoComplete="salario"
-                                autoFocus
-                                error={Boolean(errors.salario)}
-                                value={values.salario}
-                                onChange={handleChange}
-                                helperText={errors.salario}
-                            />
                             <Button
                                 fullWidth
                                 variant="contained"
@@ -286,7 +211,7 @@ function CadastrarFuncionario(props) {
                                 type="submit"
                                 disbled={isSubmitting}
                             >
-                                CADASTRAR FUNCIONÁRIO
+                                Editar
                             </Button>
                             {errors.submit && (
                                 <FormHelperText error>{errors.submit}</FormHelperText>
@@ -300,4 +225,4 @@ function CadastrarFuncionario(props) {
         </DialogContent>
     )
 }
-export default CadastrarFuncionario
+export default EditarCliente

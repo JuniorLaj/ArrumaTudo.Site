@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-export default function AcessoPedidos(){
+export function AcessoPedidos(){
     const classes = useStyles()
     const navigate = useNavigate()
     const [equipsCliente,setEquipsCliente] = useState([])
@@ -134,3 +134,4 @@ export default function AcessoPedidos(){
         </>
     )
 }
+export default AcessoPedidos

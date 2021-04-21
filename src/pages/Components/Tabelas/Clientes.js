@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux'
-import apiFuncionario from '../../../../utils/apiFuncionario'
+import { useDispatch } from 'react-redux'
+import apiCliente from '../../../utils/apiCliente'
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -11,9 +11,9 @@ import TableRow from '@material-ui/core/TableRow';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Button, Dialog, DialogTitle,  } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
-import EditarFuncionario from '../Apresentação/EditarFuncionario';
-import CadastrarFuncionario from '../Cadastro/CadastrarFuncionário'
-import ModelOk from '../../../../models/modelOk';
+import EditarCliente from '../Apresentação/EditarCliente';
+import CadastrarCliente from '../Cadastro/CadastrarCliente'
+import ModelOk from '../../../models/ModelOk';
 
 const useStyles = makeStyles({
     buttonAdd: {
@@ -24,19 +24,20 @@ const useStyles = makeStyles({
     }
 })
 
-function Funcionarios() {
-    const dispatch = useDispatch()
+function Clientes() {
     const classes = useStyles();
-    const account = useSelector(state => state.account.user.data)
-    
+    const dispatch = useDispatch()
     const [rows, setRows] = useState([])
+
     const getRows = useCallback(async () => {
-        await apiFuncionario.get(`/funcionarios/${account.idgerente}`)
+        await apiCliente.get('/retornaclientes')
             .then(response => {
+                console.log("RESPOSTA",response)
                 setRows(response.data)
             }).catch(error => {
                 console.log(error)
             })
+
     }, [setRows])
 
     useEffect(() => {
@@ -44,37 +45,39 @@ function Funcionarios() {
 
     }, [getRows])
 
+
     /*Adicionar*/
-    const [openAddFuncionario,setOpenAddFuncionario] = useState()
+    const [openAddCliente,setOpenAddCliente] = useState()
     const [openModelOkCreate, setOpenModelOkCreate] = useState(false)
 
 //#######################################################
 
-    const handleAdicionarFuncionario = () => {
-        setOpenAddFuncionario(true)
+    const handleAdicionarCliente = () => {
+        setOpenAddCliente(true)
     };
 
-    const handleCloseAddFuncionario = () => {
-        setOpenAddFuncionario(false)
+    const handleCloseCreate = () => {
+        setOpenAddCliente(false)
         setOpenModelOkCreate(true)
     };
 
     const handleCloseModelOkCreate = () => {
         setOpenModelOkCreate(false);
     };
+    
 //#######################################################
-
 
     /*Editar*/
     const [openEdit, setOpenEdit] = useState()
     const [openModelOkEdit, setOpenModelOkEdit] = useState(false)
 
 //#######################################################
+
     const handleClickOpenEdit = (tab) => {
-        dispatch({ type: 'selecionarFuncionario', payload: tab })
+        dispatch({ type: 'selecionarCliente', payload: tab })
         setOpenEdit(true);
     };
-    
+
     const handleCloseEdit = () => {
         setOpenEdit(false);
         setOpenModelOkEdit(true);    
@@ -83,24 +86,25 @@ function Funcionarios() {
     const handleCloseModelOkEdit = () => {
         setOpenModelOkEdit(false);
     };
+
 //#######################################################
 
     return(
         <>
         <div className={classes.buttonAdd}>
-        <Button onClick={handleAdicionarFuncionario} variant="contained" color="secondary">
-            Adicionar Funcionário
+        <Button onClick={handleAdicionarCliente} variant="contained" color="secondary">
+            Adicionar Cliente
         </Button>
         </div>
-        <Dialog open={openAddFuncionario} DialogContent={false}
-            onClose={handleCloseAddFuncionario} aria-labelledby="form-dialog-addFuncionario">
-            <DialogTitle id="customized-dialog-addFuncionario">Adicionar Funcionário</DialogTitle>
-            <CadastrarFuncionario close={handleCloseAddFuncionario} getRows = {()=>getRows()}/>
+        <Dialog open={openAddCliente} DialogContent={false}
+            onClose={handleCloseCreate} aria-labelledby="form-dialog-addCliente">
+            <DialogTitle id="customized-dialog-addCliente">Adicionar Cliente</DialogTitle>
+            <CadastrarCliente close={handleCloseCreate} getRows = {()=>getRows()}/>
         </Dialog>
         <Dialog open={openModelOkCreate} DialogContent={false}
             onClose={handleCloseModelOkCreate} aria-labelledby="form-sdialog-title">
-            <DialogTitle id="customized-dialosg-title">Adicionar Funcionário</DialogTitle>
-            <ModelOk message ="Funcionário adicionado com sucesso!" closeModel={handleCloseModelOkCreate}/>
+            <DialogTitle id="customized-dialosg-title">Adicionar Cliente</DialogTitle>
+            <ModelOk message ="Cliente adicionado com sucesso!" closeModel={handleCloseModelOkCreate}/>
         </Dialog>
         <TableContainer >
             <Table>
@@ -110,8 +114,7 @@ function Funcionarios() {
                         <TableCell>NOME</TableCell>
                         <TableCell>ENDEREÇO</TableCell>
                         <TableCell>TELEFONE</TableCell>
-                        <TableCell align= 'center'>DATA DE NASCIMENTO</TableCell>
-                        <TableCell>SALÁRIO R$</TableCell>
+                        <TableCell align= 'center'>CLIENTE DESDE</TableCell>
                         <TableCell align = 'center'>OPÇÕES</TableCell>
                     </TableRow>
                 </TableHead>
@@ -119,23 +122,21 @@ function Funcionarios() {
                     {
                     rows.map((tab) => (
                         <TableRow>
-                            {/* <tr> */}
-                            <TableCell>{tab.idfuncionario}</TableCell>
+                            <TableCell>{tab.idcliente}</TableCell>
                             <TableCell>{tab.nome}</TableCell>
                             <TableCell>{`Rua ${tab.rua}, nº ${tab.numero},
                                          Bairro ${tab.bairro}, ${tab.cidade}-${tab.estado}`}</TableCell>
                             <TableCell>{tab.telefone}</TableCell>
                             <TableCell align='center'>
-                                {new Date(tab.datanascimento).toLocaleDateString()}
+                                {new Date(tab.datainicio).toLocaleDateString()}
                             </TableCell>
-                            <TableCell>{tab.salario}</TableCell>
                             <TableCell align = 'center' >
                                 <Button onClick={() => handleClickOpenEdit(tab)}>
                                     <EditIcon  color='secondary'/>
                                 </Button>
                                 <Button onClick={async ()=>{
                                     try{
-                                        await apiFuncionario.delete(`/deletarfuncionario/${tab.idfuncionario}`)
+                                        await apiCliente.delete(`/deletecliente/${tab.idcliente}`)
                                     }catch(error){
                                         console.log(error)
                                     }finally{
@@ -151,14 +152,13 @@ function Funcionarios() {
                     ))}
                     <Dialog open={openEdit} DialogContent={false}
                         onClose={handleCloseEdit} aria-labelledby="form-dialog-title">
-                        <DialogTitle id="customized-dialog-title">Editar Funcionário</DialogTitle>
-                        <EditarFuncionario close={() => handleCloseEdit()} getRows = {()=>getRows()}/>
+                        <DialogTitle id="customized-dialog-title">Editar Cliente</DialogTitle>
+                        <EditarCliente close={() => handleCloseEdit()} getRows = {()=>getRows()}/>
                     </Dialog>
-
                     <Dialog open={openModelOkEdit} DialogContent={false}
                         onClose={handleCloseModelOkEdit} aria-labelledby="form-sdialog-title">
-                        <DialogTitle id="customized-dialosg-title">Editar Funcionário</DialogTitle>
-                        <ModelOk message ="Funcionário editado com sucesso!" closeModel={handleCloseModelOkEdit}/>
+                        <DialogTitle id="customized-dialosg-title">Editar Cliente</DialogTitle>
+                        <ModelOk message ="Cliente editado com sucesso!" closeModel={handleCloseModelOkEdit}/>
                     </Dialog>
                 </TableBody>
             </Table>
@@ -167,4 +167,4 @@ function Funcionarios() {
     )
 }
 
-export default Funcionarios
+export default Clientes

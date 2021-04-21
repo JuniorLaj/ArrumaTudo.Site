@@ -1,4 +1,7 @@
+import { useSelector } from 'react-redux'
+import { Navigate } from 'react-router'
 import apiFuncionario from '../utils/apiFuncionario'
+
 
 class AuthServices {
     signIn = (email, password) => {

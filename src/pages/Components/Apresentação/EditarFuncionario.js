@@ -3,15 +3,18 @@ import { DialogContent, Box, Button,FormHelperText, TextField, Grid, makeStyles}
 import { Formik } from 'formik'
 import * as Yup from 'yup';
 import { useSelector } from 'react-redux'
-import apiFuncionario from '../../../../utils/apiFuncionario'
+import apiFuncionario from '../../../utils/apiFuncionario'
 
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme)=>({
     textField: {
-        marginRight:'20vh',
+        marginRight: theme.spacing(14),
     },
+    textFielParteBaixo: {
+        marginRight: theme.spacing(10),
+    },
+}))
 
-})
 function EditarFuncionario(props) {
     const classes = useStyles()
     const funcionario = useSelector(state=> state.selectedItem.funcionario)
@@ -22,6 +25,7 @@ function EditarFuncionario(props) {
             <Box display="flex" alignItems="center" >
                 <Formik
                     initialValues={{
+                        cpf: funcionario.cpf.toString(),
                         nome: funcionario.nome.toString(),
                         rua: funcionario.rua.toString(),
                         numero: funcionario.numero,
@@ -87,11 +91,24 @@ function EditarFuncionario(props) {
                              <TextField
                                 variant="outlined"
                                 margin="normal"
+                                disabled
+                                id="cpf"
+                                label="CPF"
+                                name="cpf"
+                                autoComplete="cpf"
+                                autoFocus
+                                error={Boolean(errors.nome)}
+                                value={values.cpf}
+                                onChange={handleChange}
+                                helperText={errors.nome}
+                            />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
                                 required
                                 fullWidth
-                                className={classes.textField}
                                 id="nome"
-                                label="Nome Completo"
+                                label="Nome completo"
                                 name="nome"
                                 autoComplete="nome"
                                 autoFocus
@@ -100,6 +117,22 @@ function EditarFuncionario(props) {
                                 onChange={handleChange}
                                 helperText={errors.nome}
                             />
+                            <div>
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                id="telefone"
+                                label="Telefone para contato"
+                                name="telefone"
+                                autoComplete="Telefone"
+                                autoFocus
+                                error={Boolean(errors.telefone)}
+                                value={values.telefone}
+                                onChange={handleChange}
+                                helperText={errors.telefone}
+                            />
+                            </div>
                             <TextField
                                 variant="outlined"
                                 margin="normal"
@@ -119,7 +152,7 @@ function EditarFuncionario(props) {
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                fullWidth
+                                className={classes.textFielParteBaixo}
                                 id="numero"
                                 label="Número"
                                 name="numero"
@@ -134,7 +167,6 @@ function EditarFuncionario(props) {
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                fullWidth
                                 id="bairro"
                                 label="Bairro"
                                 name="bairro"
@@ -149,7 +181,7 @@ function EditarFuncionario(props) {
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                fullWidth
+                                className={classes.textFielParteBaixo}
                                 id="cidade"
                                 label="Cidade"
                                 name="cidade"
@@ -164,7 +196,6 @@ function EditarFuncionario(props) {
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                fullWidth
                                 id="estado"
                                 label="Estado"
                                 name="estado"
@@ -175,20 +206,6 @@ function EditarFuncionario(props) {
                                 onChange={handleChange}
                                 helperText={errors.estado}
                             />
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                id="telefone"
-                                label="Telefone para contato"
-                                name="telefone"
-                                autoComplete="Telefone"
-                                autoFocus
-                                error={Boolean(errors.telefone)}
-                                value={values.telefone}
-                                onChange={handleChange}
-                                helperText={errors.telefone}
-                                />
-                            <div>
                             <TextField
                                 variant="outlined"
                                 margin="normal"
@@ -203,7 +220,6 @@ function EditarFuncionario(props) {
                                 onChange={handleChange}
                                 helperText={errors.salario}
                             />
-                            </div>
                             <Button
                                 fullWidth
                                 variant="contained"

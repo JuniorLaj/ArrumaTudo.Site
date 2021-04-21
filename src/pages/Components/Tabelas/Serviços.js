@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useDispatch } from 'react-redux'
-import apiCliente from '../../../../utils/apiCliente'
+import { useDispatch, useSelector } from 'react-redux'
+import apiEquipamento from '../../../utils/apiEquipamento'
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -11,9 +11,10 @@ import TableRow from '@material-ui/core/TableRow';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Button, Dialog, DialogTitle,  } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
-import EditarCliente from '../Apresentação/EditarCliente';
-import CadastrarCliente from '../Cadastro/CadastrarCliente'
-import ModelOk from '../../../../models/modelOk';
+import EditarServico from '../Apresentação/EditarServico';
+import CadastrarServico from '../Cadastro/CadastrarServico'
+import { CheckCircleOutline, HourglassEmpty } from '@material-ui/icons';
+import ModelOk from '../../../models/ModelOk';
 
 const useStyles = makeStyles({
     buttonAdd: {
@@ -24,22 +25,21 @@ const useStyles = makeStyles({
     }
 })
 
-function Clientes() {
+function Servicos() {
     const classes = useStyles();
     const dispatch = useDispatch()
-    const [rows, setRows] = useState([])
+    const account = useSelector(state => state.account.user.data)
 
+    const [rows, setRows] = useState([])
     const getRows = useCallback(async () => {
-        await apiCliente.get('/retornaclientes')
+        await apiEquipamento.get(`/funcionarios/${account.idfuncionario}`)
             .then(response => {
-                console.log("RESPOSTA",response)
                 setRows(response.data)
             }).catch(error => {
                 console.log(error)
             })
 
     }, [setRows])
-
     useEffect(() => {
         getRows()       
 
@@ -47,24 +47,23 @@ function Clientes() {
 
 
     /*Adicionar*/
-    const [openAddCliente,setOpenAddCliente] = useState()
+    const [openAddServico,setOpenAddServico] = useState()
     const [openModelOkCreate, setOpenModelOkCreate] = useState(false)
-
 //#######################################################
 
-    const handleAdicionarCliente = () => {
-        setOpenAddCliente(true)
+    const handleAdicionarServico = () => {
+        setOpenAddServico(true)
     };
 
     const handleCloseCreate = () => {
-        setOpenAddCliente(false)
+        setOpenAddServico(false)
         setOpenModelOkCreate(true)
+
     };
 
     const handleCloseModelOkCreate = () => {
         setOpenModelOkCreate(false);
     };
-    
 //#######################################################
 
     /*Editar*/
@@ -74,10 +73,9 @@ function Clientes() {
 //#######################################################
 
     const handleClickOpenEdit = (tab) => {
-        dispatch({ type: 'selecionarCliente', payload: tab })
+        dispatch({ type: 'selecionarEquipamento', payload: tab })
         setOpenEdit(true);
     };
-
     const handleCloseEdit = () => {
         setOpenEdit(false);
         setOpenModelOkEdit(true);    
@@ -92,29 +90,29 @@ function Clientes() {
     return(
         <>
         <div className={classes.buttonAdd}>
-        <Button onClick={handleAdicionarCliente} variant="contained" color="secondary">
-            Adicionar Cliente
+        <Button onClick={handleAdicionarServico} variant="contained" color="secondary">
+            Adicionar Serviço
         </Button>
         </div>
-        <Dialog open={openAddCliente} DialogContent={false}
-            onClose={handleCloseCreate} aria-labelledby="form-dialog-addCliente">
-            <DialogTitle id="customized-dialog-addCliente">Adicionar Cliente</DialogTitle>
-            <CadastrarCliente close={handleCloseCreate} getRows = {()=>getRows()}/>
+        <Dialog open={openAddServico} DialogContent={false}
+            onClose={handleCloseCreate} aria-labelledby="form-dialog-addFuncionario">
+            <DialogTitle id="customized-dialog-addFuncionario">Adicionar Serviço</DialogTitle>
+            <CadastrarServico close={handleCloseCreate} getRows = {()=>getRows()}/>
         </Dialog>
         <Dialog open={openModelOkCreate} DialogContent={false}
             onClose={handleCloseModelOkCreate} aria-labelledby="form-sdialog-title">
-            <DialogTitle id="customized-dialosg-title">Adicionar Cliente</DialogTitle>
-            <ModelOk message ="Cliente adicionado com sucesso!" closeModel={handleCloseModelOkCreate}/>
+            <DialogTitle id="customized-dialosg-title">Adicionar Serviço</DialogTitle>
+            <ModelOk message ="Serviço adicionado com sucesso!" closeModel={handleCloseModelOkCreate}/>
         </Dialog>
         <TableContainer >
             <Table>
                 <TableHead>
                     <TableRow>
                         <TableCell>ID</TableCell>
-                        <TableCell>NOME</TableCell>
-                        <TableCell>ENDEREÇO</TableCell>
-                        <TableCell>TELEFONE</TableCell>
-                        <TableCell align= 'center'>DATA DE NASCIMENTO</TableCell>
+                        <TableCell>TIPO</TableCell>
+                        <TableCell>DEFEITO</TableCell>
+                        <TableCell align= 'center'>DATA DE ENTRADA</TableCell>
+                        <TableCell>STATUS</TableCell>
                         <TableCell align = 'center'>OPÇÕES</TableCell>
                     </TableRow>
                 </TableHead>
@@ -123,21 +121,24 @@ function Clientes() {
                     rows.map((tab) => (
                         <TableRow>
                             {/* <tr> */}
-                            <TableCell>{tab.idcliente}</TableCell>
-                            <TableCell>{tab.nome}</TableCell>
-                            <TableCell>{`Rua ${tab.rua}, nº ${tab.numero},
-                                         Bairro ${tab.bairro}, ${tab.cidade}-${tab.estado}`}</TableCell>
-                            <TableCell>{tab.telefone}</TableCell>
-                            <TableCell align='center'>
-                                {new Date(tab.data_nascimento).toLocaleDateString()}
-                            </TableCell>
+                            <TableCell>{tab.idequipamento}</TableCell>
+                            <TableCell>{tab.tipo}</TableCell>
+                            <TableCell>{tab.defeito}</TableCell>
+                            <TableCell align = 'center'> {new Date(tab.dataentrada).toLocaleDateString()}</TableCell>
+                            <TableCell align = 'center'>{(
+                            tab.status
+                            ?
+                            <CheckCircleOutline/>
+                            :
+                            <HourglassEmpty/>
+                            )}</TableCell>
                             <TableCell align = 'center' >
                                 <Button onClick={() => handleClickOpenEdit(tab)}>
                                     <EditIcon  color='secondary'/>
                                 </Button>
                                 <Button onClick={async ()=>{
                                     try{
-                                        await apiCliente.delete(`/deletecliente/${tab.idcliente}`)
+                                        await apiEquipamento.delete(`/deleteEquipamento/${tab.idequipamento}`)
                                     }catch(error){
                                         console.log(error)
                                     }finally{
@@ -148,18 +149,17 @@ function Clientes() {
                                     <DeleteIcon color='primary'/>
                                 </Button>
                             </TableCell>
-                            
-                            </TableRow>
+                        </TableRow>
                     ))}
                     <Dialog open={openEdit} DialogContent={false}
                         onClose={handleCloseEdit} aria-labelledby="form-dialog-title">
-                        <DialogTitle id="customized-dialog-title">Editar Cliente</DialogTitle>
-                        <EditarCliente close={() => handleCloseEdit()} getRows = {()=>getRows()}/>
+                        <DialogTitle id="customized-dialog-title">Editar Serviço</DialogTitle>
+                        <EditarServico close ={() => handleCloseEdit()} getRows = {()=>getRows()}/>
                     </Dialog>
                     <Dialog open={openModelOkEdit} DialogContent={false}
                         onClose={handleCloseModelOkEdit} aria-labelledby="form-sdialog-title">
-                        <DialogTitle id="customized-dialosg-title">Editar Cliente</DialogTitle>
-                        <ModelOk message ="Cliente editado com sucesso!" closeModel={handleCloseModelOkEdit}/>
+                        <DialogTitle id="customized-dialosg-title">Editar Serviço</DialogTitle>
+                        <ModelOk message ="Serviço editado com sucesso!" closeModel={handleCloseModelOkEdit}/>
                     </Dialog>
                 </TableBody>
             </Table>
@@ -168,4 +168,4 @@ function Clientes() {
     )
 }
 
-export default Clientes
+export default Servicos

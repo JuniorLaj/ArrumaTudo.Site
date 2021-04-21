@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react'
 import { Box, makeStyles, Typography, Avatar, AppBar, Toolbar, Menu, MenuItem, Button } from '@material-ui/core'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
+import { signOut } from '../../actions/accountActions'
 
 
 const useStyles = makeStyles({

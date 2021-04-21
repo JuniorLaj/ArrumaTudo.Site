@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Box, Tabs, Tab, Typography, makeStyles } from '@material-ui/core'
 import { useSelector } from 'react-redux'
-import Serviços from './Components/Tabelas/Serviços'
-import Funcionarios from './Components/Tabelas/Funcionarios'
-import Clientes from './Components/Tabelas/Clientes'
-
+import Serviços from '../Components/Tabelas/Serviços'
+import Funcionarios from '../Components/Tabelas/Funcionarios'
+import Clientes from '../Components/Tabelas/Clientes'
+import Header from '../Header'
 const useStyles = makeStyles({
 
     parteBaixo: {
@@ -17,7 +17,7 @@ const useStyles = makeStyles({
         // backgroundColor:'purple',
     }
 })
-export default function Cadastros() {
+export default function Home() {
     function TabPanel(props) {
         const { children, value, index, ...other } = props
         return (
@@ -41,11 +41,14 @@ export default function Cadastros() {
         setTab(newValue)
     }
     return (
+        <>
+        <Header/>
         <Box className={classes.parteBaixo}>
             <Box className={classes.Abas} >
                 <Tabs orientation="horizontal" value={tab} onChange={handleChange}>
                     <Tab label="Clientes" />
-                    <Tab label="Funcionários" />
+                    {(account.idfuncionario ===account.idgerente
+                    ? <Tab label="Funcionários" /> : <></>)}
                     <Tab label="Serviços" />
                 </Tabs>
                 <TabPanel value={tab} index={0}>
@@ -66,5 +69,6 @@ export default function Cadastros() {
 
             </Box>
         </Box>
+        </>
     )
 }

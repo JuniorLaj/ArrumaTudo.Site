@@ -2,14 +2,17 @@ import React from 'react'
 import { DialogContent, Box, Button,FormHelperText, TextField, Grid, makeStyles } from '@material-ui/core'
 import { Formik } from 'formik'
 import * as Yup from 'yup';
-import apiCliente from '../../../../utils/apiCliente'
+import apiCliente from '../../../utils/apiCliente'
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
     textField: {
-        marginRight:'20vh',
+        marginRight: theme.spacing(14),
+    },
+    textFielParteBaixo: {
+        marginRight: theme.spacing(10),
     },
 
-})
+}))
 function CadastrarCliente(props) {
     const classes = useStyles()
     return (
@@ -98,13 +101,11 @@ function CadastrarCliente(props) {
                                 onChange={handleChange}
                                 helperText={errors.nome}
                             />
-                            <div>
-
                             <TextField
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                className={classes.textField}
+                                fullWidth
                                 id="nome"
                                 label="Nome completo"
                                 name="nome"
@@ -115,11 +116,12 @@ function CadastrarCliente(props) {
                                 onChange={handleChange}
                                 helperText={errors.nome}
                             />
-                            {/* <div className={classes.space}/> */}
+                            <div>
                             <TextField
                                 variant="outlined"
                                 margin="normal"
                                 required
+                                className={classes.textField}
                                 type='date'
                                 id="data_nascimento"
                                 label="Data de Nascimento"
@@ -134,7 +136,6 @@ function CadastrarCliente(props) {
                                     shrink: true,
                                 }}
                             />
-                            </div>
                             <TextField
                                 variant="outlined"
                                 margin="normal"
@@ -149,7 +150,7 @@ function CadastrarCliente(props) {
                                 onChange={handleChange}
                                 helperText={errors.telefone}
                             />
-                            
+                            </div>
                             <TextField
                                 variant="outlined"
                                 margin="normal"
@@ -169,7 +170,7 @@ function CadastrarCliente(props) {
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                fullWidth
+                                className={classes.textFielParteBaixo}
                                 id="numero"
                                 label="Número"
                                 name="numero"
@@ -184,7 +185,6 @@ function CadastrarCliente(props) {
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                fullWidth
                                 id="bairro"
                                 label="Bairro"
                                 name="bairro"
@@ -199,7 +199,7 @@ function CadastrarCliente(props) {
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                fullWidth
+                                className={classes.textFielParteBaixo}
                                 id="cidade"
                                 label="Cidade"
                                 name="cidade"
@@ -214,7 +214,6 @@ function CadastrarCliente(props) {
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                fullWidth
                                 id="estado"
                                 label="Estado"
                                 name="estado"

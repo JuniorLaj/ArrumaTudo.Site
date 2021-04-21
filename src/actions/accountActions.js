@@ -15,25 +15,5 @@ const signIn = (email, password) => {
     }
 }
 
-const signOut = () => {
-    return async (dispatch) => {
-        await authService.signOut()
-        dispatch({
-            type: SIGN_OUT,
-        })
-    }
-}
 
-// const setUserData = () => {
-//     return async (dispatch) => {
-//         const user = await authService.signInWithToken()
-
-//         dispatch({
-//             type: SILENT_LOGIN,
-//             payload: {
-//                 user,
-//             }
-//         })
-//     }
-// }
-export { signIn, signOut }
+export { signIn }

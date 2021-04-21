@@ -2,67 +2,83 @@ import React from 'react'
 import { DialogContent, Box, Button,FormHelperText, TextField, Grid, makeStyles } from '@material-ui/core'
 import { Formik } from 'formik'
 import * as Yup from 'yup';
-import { useSelector } from 'react-redux'
-import apiCliente from '../../../../utils/apiCliente'
+import apiFuncionario from '../../../utils/apiFuncionario'
+import { useSelector } from 'react-redux';
 
-
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
     textField: {
-        marginRight:'20vh',
+        marginRight: theme.spacing(14),
     },
-
-})
-function EditarCliente(props) {
+    textFielParteBaixo: {
+        marginRight: theme.spacing(10),
+    },
+}))
+function CadastrarFuncionario(props) {
+    const account = useSelector(state => state.account.user.data)
     const classes = useStyles()
-    const cliente = useSelector(state=> state.selectedItem.cliente)
     return (
         <DialogContent>
             <Grid>
             <Box display="flex" alignItems="center" >
                 <Formik
                     initialValues={{
-                        cpf: cliente.cpf,
-                        nome: cliente.nome.toString(),
-                        telefone: cliente.telefone.toString(),
-                        rua: cliente.rua.toString(),
-                        numero: cliente.numero,
-                        bairro: cliente.bairro.toString(),
-                        cidade: cliente.cidade.toString(),
-                        estado: cliente.estado.toString(),
+                        cpf: '',
+                        nome: '',
+                        rua: '',
+                        numero: '',
+                        bairro: '',
+                        cidade: '',
+                        estado: '',
+                        telefone: '',
+                        data_nascimento: '',
+                        email: '',
+                        senha: '',
+                        salario: '',
                     }}
                     validationSchema={Yup.object().shape({
+                        cpf: Yup.string()
+                        .min(11,'CPF de 11 dígitos.')
+                        .required('Informe seu CPF'),
                         nome: Yup.string().max(255)
-                            .min(10, 'O nome precisa ter ao menos 10 caracteres')
                             .required('Favor informar o nome completo'),
-                        telefone: Yup.string().max(11,'Telefone tem mais de 11 dígitos.')
-                            .required('Favor informar um Telefone. '),
                         rua: Yup.string()
                         .max(255)
                         .required('Favor informar a rua.'),
                         bairro: Yup.string()
-                            .max(50)
+                            .max(255)
                             .required('Favor informar o bairro.'),
                         cidade: Yup.string()
-                        .max(50)
+                        .max(255)
                         .required('Favor informar a cidade.'),
                         estado: Yup.string()
                         .max(2,'Coloque somente a sigla do estado.')
                         .required('Favor informar o estado.'),
+                        telefone: Yup.string().max(11,'Telefone tem mais de 11 dígitos.')
+                            .required('Favor informar um Telefone. '),
+                        data_nascimento: Yup.string().required('Favor informar uma data de nascimento. '),
+                        email: Yup.string().max(50).min(20).required("Informe um email."),
+                        senha: Yup.string().max(10,'Máximo 10 caracteres na senha.')
+                        .min(5, 'Mínimo 5 caracteres na senha.').required('Favor informar uma senha.')
                     })}
                     onSubmit={async (
                         values,
                         { setErrors, setStatus, setSubmitting },
                     ) => {
                         try {
-                            await apiCliente.put(`/editarcliente`,{
+                            await apiFuncionario.post(`/adicionarfuncionario`,{
+                                cpf: values.cpf,
                                 nome: values.nome,
-                                telefone: values.telefone,
                                 rua: values.rua,
                                 numero: values.numero,
                                 bairro: values.bairro,
                                 cidade: values.cidade,
                                 estado: values.estado,
-                                idCliente: cliente.idcliente
+                                telefone: values.telefone,
+                                dataNascimento: values.data_nascimento,
+                                email: values.email,
+                                senha: values.senha,
+                                salario: values.salario,
+                                idGerente: account.idgerente
                             })
                             setStatus({ success: true });
                             setSubmitting(true);
@@ -81,12 +97,25 @@ function EditarCliente(props) {
                 >
                     {({ errors, handleChange, handleSubmit, isSubmitting, values }) => (
                         <form noValidate  onSubmit={handleSubmit}>
-                            <div>
                             <TextField
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                className={classes.textField}
+                                id="cpf"
+                                label="CPF"
+                                name="cpf"
+                                autoComplete="cpf"
+                                autoFocus
+                                error={Boolean(errors.nome)}
+                                value={values.cpf}
+                                onChange={handleChange}
+                                helperText={errors.nome}
+                            />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
                                 id="nome"
                                 label="Nome completo"
                                 name="nome"
@@ -97,8 +126,26 @@ function EditarCliente(props) {
                                 onChange={handleChange}
                                 helperText={errors.nome}
                             />
-                            {/* <div className={classes.space}/> */}
-                            </div>
+                            <div>
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                className={classes.textField}
+                                type='date'
+                                id="data_nascimento"
+                                label="Data de Nascimento"
+                                name="data_nascimento"
+                                autoComplete="Data de Nascimento"
+                                autoFocus
+                                error={Boolean(errors.data_nascimento)}
+                                value={values.data_nascimento}
+                                onChange={handleChange}
+                                helperText={errors.data_nascimento}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                            />
                             <TextField
                                 variant="outlined"
                                 margin="normal"
@@ -113,7 +160,7 @@ function EditarCliente(props) {
                                 onChange={handleChange}
                                 helperText={errors.telefone}
                             />
-                            
+                            </div>
                             <TextField
                                 variant="outlined"
                                 margin="normal"
@@ -133,7 +180,7 @@ function EditarCliente(props) {
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                fullWidth
+                                className={classes.textFielParteBaixo}
                                 id="numero"
                                 label="Número"
                                 name="numero"
@@ -148,7 +195,6 @@ function EditarCliente(props) {
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                fullWidth
                                 id="bairro"
                                 label="Bairro"
                                 name="bairro"
@@ -163,7 +209,7 @@ function EditarCliente(props) {
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                fullWidth
+                                className={classes.textFielParteBaixo}
                                 id="cidade"
                                 label="Cidade"
                                 name="cidade"
@@ -178,7 +224,6 @@ function EditarCliente(props) {
                                 variant="outlined"
                                 margin="normal"
                                 required
-                                fullWidth
                                 id="estado"
                                 label="Estado"
                                 name="estado"
@@ -189,6 +234,51 @@ function EditarCliente(props) {
                                 onChange={handleChange}
                                 helperText={errors.estado}
                             />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="email"
+                                label="Email"
+                                name="email"
+                                autoComplete="email"
+                                autoFocus
+                                error={Boolean(errors.email)}
+                                value={values.email}
+                                onChange={handleChange}
+                                helperText={errors.email}
+                            />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                fullWidth
+                                type="password"
+                                id="senha"
+                                label="Senha"
+                                name="senha"
+                                autoComplete="senha"
+                                autoFocus
+                                error={Boolean(errors.senha)}
+                                value={values.senha}
+                                onChange={handleChange}
+                                helperText={errors.senha}
+                            />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                required
+                                id="salario"
+                                label="Salário"
+                                name="salario"
+                                autoComplete="salario"
+                                autoFocus
+                                error={Boolean(errors.salario)}
+                                value={values.salario}
+                                onChange={handleChange}
+                                helperText={errors.salario}
+                            />
                             <Button
                                 fullWidth
                                 variant="contained"
@@ -197,7 +287,7 @@ function EditarCliente(props) {
                                 type="submit"
                                 disbled={isSubmitting}
                             >
-                                Editar
+                                CADASTRAR FUNCIONÁRIO
                             </Button>
                             {errors.submit && (
                                 <FormHelperText error>{errors.submit}</FormHelperText>
@@ -211,4 +301,4 @@ function EditarCliente(props) {
         </DialogContent>
     )
 }
-export default EditarCliente
+export default CadastrarFuncionario

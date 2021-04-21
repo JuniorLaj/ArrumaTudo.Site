@@ -1,11 +1,11 @@
 import { Provider } from 'react-redux';
 import { BrowserRouter, Routes} from 'react-router-dom'
 import './App.css';
-import Home from './pages'
-import HomeCliente from './pages/HomeCliente';
+import Home from './pages/Home'
+import HomeCliente from './pages';
 import GuestRoute from './routes/guestRoute';
 import store from './store'
-import AcessoPedidos from './pages/HomeCliente/AcessoPedidos';
+import AcessoPedidos from './pages/AcessoPedidos/';
 function App() {
   return (
     <Provider store={store}>

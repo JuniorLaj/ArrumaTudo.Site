@@ -1,13 +1,23 @@
-import React from 'react'
-import { DialogContent, Box, Button,FormHelperText, TextField, Grid } from '@material-ui/core'
+import React, {useState} from 'react'
+import {makeStyles, DialogContent, Box, Button,FormHelperText, TextField, Grid, InputLabel, Select, MenuItem } from '@material-ui/core'
 import { Formik } from 'formik'
 import * as Yup from 'yup';
 import { useSelector } from 'react-redux'
-import apiEquipamento from '../../../../utils/apiEquipamento'
+import apiEquipamento from '../../../utils/apiEquipamento'
 
+const useStyles = makeStyles((theme) => ({
+    spaceStatus: {
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(2),
+    }
+}))
 function EditarServico(props) {
     const equipamento = useSelector(state => state.selectedItem.equipamento)
-    console.log(equipamento)
+    const classes = useStyles()
+    const [status,setStatus] = useState(equipamento.status)
+    const handleChangeStatus = (event) => {
+        setStatus(event.target.value)
+    }
     return (
         <DialogContent>
             <Grid>
@@ -33,7 +43,7 @@ function EditarServico(props) {
                             await apiEquipamento.put(`/editarequipamento`,{
                                 modelo: values.modelo,
                                 defeito: values.defeito,
-                                status: values.status,
+                                status: status,
                                 idEquipamento: equipamento.idequipamento
                             })
                             setStatus({ success: true });
@@ -130,6 +140,21 @@ function EditarServico(props) {
                                 onChange={handleChange}
                                 helperText={errors.defeito}
                             />
+                            <Box className={classes.spaceStatus}>
+                            <InputLabel id="status">Status</InputLabel>
+                                <Select
+                                labelId="status"
+                                id="status"
+                                error={Boolean(errors.tipo)}
+                                value={status? "Consertado" : "Em manutenção"}
+                                helperText={errors.tipo}
+                                onChange={handleChangeStatus}
+                                renderValue={(value) => `${value}`}
+                                >
+                                <MenuItem value={false}>Em manutenção</MenuItem>
+                                <MenuItem value={true}>Consertado</MenuItem>
+                                </Select>
+                            </Box>
                             <Button
                                 fullWidth
                                 variant="contained"
